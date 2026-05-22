@@ -11,7 +11,7 @@ class RegisterCompany extends RegisterTenant
 {
     public static function getLabel(): string
     {
-        return 'Register company';
+        return __('tenancy.actions.register_company');
     }
 
     public function form(Schema $schema): Schema
@@ -19,7 +19,7 @@ class RegisterCompany extends RegisterTenant
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Company name')
+                    ->label(__('tenancy.fields.company_name'))
                     ->required()
                     ->maxLength(255),
             ]);

@@ -10,7 +10,7 @@ class EditCompanyProfile extends EditTenantProfile
 {
     public static function getLabel(): string
     {
-        return 'Company profile';
+        return __('tenancy.pages.company_profile');
     }
 
     public function form(Schema $schema): Schema
@@ -18,7 +18,7 @@ class EditCompanyProfile extends EditTenantProfile
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Company name')
+                    ->label(__('tenancy.fields.company_name'))
                     ->required()
                     ->maxLength(255),
             ]);
