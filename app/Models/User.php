@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password'])]
@@ -40,19 +39,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 
     public function canAccessPanel(Panel $panel): bool
     {
-        $tableNames = config('permission.table_names');
-        $columnNames = config('permission.column_names');
-        $modelHasRolesTable = $tableNames['model_has_roles'];
-        $rolesTable = $tableNames['roles'];
-        $rolePivotKey = $columnNames['role_pivot_key'] ?? 'role_id';
-        $modelMorphKey = $columnNames['model_morph_key'] ?? 'model_id';
-
-        return DB::table($modelHasRolesTable)
-            ->join($rolesTable, "{$rolesTable}.id", '=', "{$modelHasRolesTable}.{$rolePivotKey}")
-            ->where("{$modelHasRolesTable}.{$modelMorphKey}", $this->getKey())
-            ->where("{$modelHasRolesTable}.model_type", $this->getMorphClass())
-            ->whereIn("{$rolesTable}.name", ['super_admin', 'company_admin', 'manager', 'worker'])
-            ->exists();
+        return $this->hasAnyRole(['super_admin', 'company_admin', 'manager', 'worker']);
     }
 
     /**
