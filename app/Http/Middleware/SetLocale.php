@@ -10,7 +10,7 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $availableLocales = array_keys(config('locales.available', []));
+        $availableLocales = config('app.available_locales', []);
         $locale = $request->session()->get('locale', config('app.locale'));
 
         if (! in_array($locale, $availableLocales, true)) {

@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Enums\Locale;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
 use App\Http\Middleware\SetLocale;
 use App\Models\Company;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -22,6 +24,7 @@ use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -39,17 +42,30 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->userMenuItems([
-                Action::make('locale_en')
-                    ->label(fn (): string => __('locale.languages.en'))
-                    ->icon(fn (): Heroicon => app()->isLocale('en') ? Heroicon::Check : Heroicon::Language)
-                    ->color(fn (): string => app()->isLocale('en') ? 'primary' : 'gray')
-                    ->url(fn (): string => route('locale.update', ['locale' => 'en']))
-                    ->sort(90),
-                Action::make('locale_ka')
-                    ->label(fn (): string => __('locale.languages.ka'))
-                    ->icon(fn (): Heroicon => app()->isLocale('ka') ? Heroicon::Check : Heroicon::Language)
-                    ->color(fn (): string => app()->isLocale('ka') ? 'primary' : 'gray')
-                    ->url(fn (): string => route('locale.update', ['locale' => 'ka']))
+                Action::make('locale')
+                    ->label(fn (): string => Locale::current()->getLabel())
+                    ->icon(fn (): Heroicon => Locale::current()->getIcon())
+                    ->color(fn (): string => Locale::current()->getColor())
+                    ->schema([
+                        Select::make('locale')
+                            ->label(fn (): string => __('locale.select'))
+                            ->options(fn (): array => Locale::options())
+                            ->required()
+                            ->native(false),
+                    ])
+                    ->fillForm(fn (): array => [
+                        'locale' => app()->getLocale(),
+                    ])
+                    ->action(function (array $data): RedirectResponse {
+                        $locale = Locale::tryFrom($data['locale']);
+
+                        abort_unless($locale !== null && in_array($locale->value, Locale::values(), true), 404);
+
+                        session(['locale' => $locale->value]);
+                        app()->setLocale($locale->value);
+
+                        return redirect(request()->header('Referer'));
+                    })
                     ->sort(91),
             ])
             ->tenant(Company::class)
