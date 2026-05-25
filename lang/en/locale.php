@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'select' => 'Language',
+    'language' => 'Language',
     'en' => 'English',
-    'ka' => 'Georgian',
+    'ka' => 'ქართული',
 ];

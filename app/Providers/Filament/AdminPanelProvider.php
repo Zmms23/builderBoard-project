@@ -48,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
                     ->color(fn (): string => Locale::current()->getColor())
                     ->schema([
                         Select::make('locale')
-                            ->label(fn (): string => __('locale.select'))
+                            ->label(fn (): string => __('locale.language'))
                             ->options(fn (): array => Locale::options())
                             ->required()
                             ->native(false),

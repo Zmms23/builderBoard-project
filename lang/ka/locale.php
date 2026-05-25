@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'select' => 'ენა',
-    'en' => 'ინგლისური',
+    'language' => 'ენა',
+    'en' => 'English',
     'ka' => 'ქართული',
 ];
