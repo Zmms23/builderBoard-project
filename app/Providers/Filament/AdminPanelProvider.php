@@ -24,7 +24,7 @@ use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Http\RedirectResponse;
+
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -56,7 +56,7 @@ class AdminPanelProvider extends PanelProvider
                     ->fillForm(fn (): array => [
                         'locale' => app()->getLocale(),
                     ])
-                    ->action(function (array $data): RedirectResponse {
+                    ->action(function (array $data){
                         $locale = Locale::tryFrom($data['locale']);
 
                         abort_unless($locale !== null && in_array($locale->value, Locale::values(), true), 404);
