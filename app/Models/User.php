@@ -24,6 +24,8 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable;
 
+    private const PANEL_ROLES = ['super_admin', 'company_admin', 'manager', 'worker'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -39,7 +41,26 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasAnyRole(['super_admin', 'company_admin', 'manager', 'worker']);
+        $currentTeamId = getPermissionsTeamId();
+
+        try {
+            if ($this->hasPanelRole()) {
+                return true;
+            }
+
+            foreach ($this->companies as $company) {
+                setPermissionsTeamId($company->id);
+
+                if ($this->hasPanelRole()) {
+                    return true;
+                }
+            }
+
+            return false;
+        } finally {
+            setPermissionsTeamId($currentTeamId);
+            $this->unsetRelation('roles');
+        }
     }
 
     /**
@@ -63,5 +84,12 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         return $tenant instanceof Company
             && $this->companies()->whereKey($tenant)->exists();
+    }
+
+    private function hasPanelRole(): bool
+    {
+        $this->unsetRelation('roles');
+
+        return $this->hasAnyRole(self::PANEL_ROLES);
     }
 }
