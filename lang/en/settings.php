@@ -11,7 +11,6 @@ return [
         'client_progress_enabled' => 'Client progress',
         'currency' => 'Currency',
         'email' => 'Email',
-        'logo' => 'Logo',
         'phone' => 'Phone',
         'primary_color' => 'Primary color',
         'proof_upload_enabled' => 'Proof upload',
