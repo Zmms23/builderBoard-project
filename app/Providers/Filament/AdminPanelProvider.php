@@ -2,7 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Enums\Locale;
+use App\Filament\Pages\Tenancy\EditCompanyProfile;
+use App\Filament\Pages\Tenancy\RegisterCompany;
+use App\Http\Middleware\SetLocale;
+use App\Models\Company;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -11,11 +18,13 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -32,6 +41,36 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->userMenuItems([
+                Action::make('locale')
+                    ->label(fn (): string => Locale::current()->getLabel())
+                    ->icon(fn (): Heroicon => Locale::current()->getIcon())
+                    ->color(fn (): string => Locale::current()->getColor())
+                    ->schema([
+                        Select::make('locale')
+                            ->label(fn (): string => __('locale.language'))
+                            ->options(fn (): array => Locale::options())
+                            ->required()
+                            ->native(false),
+                    ])
+                    ->fillForm(fn (): array => [
+                        'locale' => app()->getLocale(),
+                    ])
+                    ->action(function (array $data){
+                        $locale = Locale::tryFrom($data['locale']);
+
+                        abort_unless($locale !== null && in_array($locale->value, Locale::values(), true), 404);
+
+                        session(['locale' => $locale->value]);
+                        app()->setLocale($locale->value);
+
+                        return redirect(request()->header('Referer'));
+                    })
+                    ->sort(91),
+            ])
+            ->tenant(Company::class)
+            ->tenantRegistration(RegisterCompany::class)
+            ->tenantProfile(EditCompanyProfile::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -46,6 +85,7 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
