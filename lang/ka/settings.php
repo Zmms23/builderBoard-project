@@ -11,6 +11,7 @@ return [
         'client_progress_enabled' => 'კლიენტის პროგრესი',
         'currency' => 'ვალუტა',
         'email' => 'ელფოსტა',
+        'logo' => 'ლოგო',
         'phone' => 'ტელეფონი',
         'primary_color' => 'ძირითადი ფერი',
         'proof_upload_enabled' => 'შესრულების ფოტოები',
