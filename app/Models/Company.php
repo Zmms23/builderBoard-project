@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['name', 'slug'])]
 class Company extends Model
@@ -21,5 +22,13 @@ class Company extends Model
     {
         return $this->belongsToMany(User::class)
             ->withTimestamps();
+    }
+
+    /**
+     * @return HasOne<CompanySetting, $this>
+     */
+    public function setting(): HasOne
+    {
+        return $this->hasOne(CompanySetting::class);
     }
 }
