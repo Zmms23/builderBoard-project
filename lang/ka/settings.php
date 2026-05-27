@@ -6,10 +6,16 @@ return [
     ],
     'fields' => [
         'address' => 'მისამართი',
+        'budget_tracking_enabled' => 'ბიუჯეტის კონტროლი',
+        'chat_enabled' => 'ჩატი',
+        'client_progress_enabled' => 'კლიენტის პროგრესი',
         'currency' => 'ვალუტა',
         'email' => 'ელფოსტა',
+        'logo' => 'ლოგო',
         'phone' => 'ტელეფონი',
         'primary_color' => 'ძირითადი ფერი',
+        'proof_upload_enabled' => 'შესრულების ფოტოები',
+        'reviews_enabled' => 'შეფასებები',
         'website' => 'ვებსაიტი',
     ],
     'navigation' => [
@@ -23,6 +29,7 @@ return [
     ],
     'sections' => [
         'branding' => 'ბრენდინგი',
+        'features' => 'ფუნქციები',
         'profile' => 'კომპანიის პროფილი',
     ],
 ];

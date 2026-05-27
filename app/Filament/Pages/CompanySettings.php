@@ -9,8 +9,10 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
@@ -80,6 +82,12 @@ class CompanySettings extends Page
             ->components([
                 Section::make(__('settings.sections.profile'))
                     ->schema([
+                        FileUpload::make('logo_path')
+                            ->label(__('settings.fields.logo'))
+                            ->image()
+                            ->disk('public')
+                            ->directory('company-logos')
+                            ->visibility('public'),
                         TextInput::make('phone')
                             ->label(__('settings.fields.phone'))
                             ->tel()
@@ -106,6 +114,20 @@ class CompanySettings extends Page
                         ColorPicker::make('primary_color')
                             ->label(__('settings.fields.primary_color'))
                             ->required(),
+                    ])
+                    ->columns(2),
+                Section::make(__('settings.sections.features'))
+                    ->schema([
+                        Toggle::make('client_progress_enabled')
+                            ->label(__('settings.fields.client_progress_enabled')),
+                        Toggle::make('budget_tracking_enabled')
+                            ->label(__('settings.fields.budget_tracking_enabled')),
+                        Toggle::make('proof_upload_enabled')
+                            ->label(__('settings.fields.proof_upload_enabled')),
+                        Toggle::make('chat_enabled')
+                            ->label(__('settings.fields.chat_enabled')),
+                        Toggle::make('reviews_enabled')
+                            ->label(__('settings.fields.reviews_enabled')),
                     ])
                     ->columns(2),
             ]);

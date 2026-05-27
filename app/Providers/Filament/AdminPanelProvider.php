@@ -9,6 +9,7 @@ use App\Http\Middleware\SetLocale;
 use App\Models\Company;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -27,6 +28,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -38,9 +40,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->colors([
-                'primary' => Color::Amber,
-            ])
+            ->brandLogo(fn (): ?string => $this->getTenantLogoUrl())
+            ->brandLogoHeight('2rem')
+            ->colors(fn (): array => $this->getTenantColors())
             ->userMenuItems([
                 Action::make('locale')
                     ->label(fn (): string => Locale::current()->getLabel())
@@ -99,5 +101,31 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function getTenantColors(): array
+    {
+        $primaryColor = $this->getTenant()?->setting?->primary_color;
+
+        return [
+            'primary' => filled($primaryColor) ? Color::hex($primaryColor) : Color::Amber,
+        ];
+    }
+
+    private function getTenantLogoUrl(): ?string
+    {
+        $logoPath = $this->getTenant()?->setting?->logo_path;
+
+        return filled($logoPath) ? Storage::disk('public')->url($logoPath) : null;
+    }
+
+    private function getTenant(): ?Company
+    {
+        $tenant = Filament::getTenant();
+
+        return $tenant instanceof Company ? $tenant : null;
     }
 }
