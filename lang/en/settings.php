@@ -2,7 +2,9 @@
 
 return [
     'actions' => [
+        'remove_logo' => 'Remove logo',
         'save' => 'Save settings',
+        'upload_logo' => 'Upload logo',
     ],
     'fields' => [
         'address' => 'Address',
@@ -18,10 +20,15 @@ return [
         'reviews_enabled' => 'Reviews',
         'website' => 'Website',
     ],
+    'help' => [
+        'logo' => 'Upload a company logo up to 2 MB. Re-uploading replaces the current logo.',
+    ],
     'navigation' => [
         'label' => 'Company settings',
     ],
     'notifications' => [
+        'logo_removed' => 'Company logo removed',
+        'logo_uploaded' => 'Company logo updated',
         'saved' => 'Company settings saved',
     ],
     'pages' => [
@@ -30,6 +37,10 @@ return [
     'sections' => [
         'branding' => 'Branding',
         'features' => 'Features',
+        'logo' => 'Logo',
         'profile' => 'Company profile',
+    ],
+    'states' => [
+        'no_logo' => 'No logo uploaded yet',
     ],
 ];
