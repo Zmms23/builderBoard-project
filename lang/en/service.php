@@ -1,8 +1,6 @@
 <?php
-
 return [
     'columns' => [
-        'base_price' => 'Base price',
         'description' => 'Description',
         'is_active' => 'Active',
         'name' => 'Name',
@@ -10,7 +8,6 @@ return [
         'updated_at' => 'Updated at',
     ],
     'fields' => [
-        'base_price' => 'Base price',
         'description' => 'Description',
         'is_active' => 'Active',
         'name' => 'Service name',
@@ -29,6 +26,5 @@ return [
     ],
     'sections' => [
         'details' => 'Service details',
-        'pricing' => 'Pricing and status',
     ],
 ];
