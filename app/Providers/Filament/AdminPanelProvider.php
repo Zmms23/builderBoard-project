@@ -37,29 +37,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->profile()
             ->login()
 
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
 
-            ->brandLogo(function (): ?string {
-                try {
-                    $settings = app(CompanySettingsData::class);
-
-                    if (! filled($settings->logo_path)) {
-                        return null;
-                    }
-
-                    if (! Storage::disk('public')->exists($settings->logo_path)) {
-                        return null;
-                    }
-
-                    return Storage::disk('public')->url($settings->logo_path);
-                } catch (\Throwable $e) {
-                    report($e);
-
-                    return null;
-                }
-            })
+            ->brandLogo(fn (): ?string => $this->settings()?->logo_path? asset('storage/' . $this->settings()->logo_path): asset('images/download.png'))
+               
 
             ->brandLogoHeight('2rem')
 
@@ -156,5 +140,10 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    private function settings(): ?CompanySettingsData 
+    {
+        return app(CompanySettingsData::class);   
     }
 }
