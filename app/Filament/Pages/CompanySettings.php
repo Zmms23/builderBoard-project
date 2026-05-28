@@ -6,7 +6,6 @@ use App\Enums\Currency;
 use App\Settings\CompanySettings as CompanySettingsData;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -40,13 +39,6 @@ class CompanySettings extends SettingsPage
             ->components([
                 Section::make(__('settings.sections.profile'))
                     ->schema([
-                        FileUpload::make('logo_path')
-                            ->label(__('settings.fields.logo'))
-                            ->image()
-                            ->disk('public')
-                            ->directory('company-logos')
-                            ->visibility('public')
-                            ->maxSize(2048),
                         TextInput::make('phone')
                             ->label(__('settings.fields.phone'))
                             ->tel()
