@@ -16,7 +16,14 @@ return [
         'name' => 'Service name',
         'slug' => 'Slug',
     ],
+    'filters' => [
+        'active' => 'Active only',
+        'all' => 'All services',
+        'inactive' => 'Inactive only',
+        'is_active' => 'Status',
+    ],
     'navigation' => [
+        'badge' => 'Service count',
         'plural' => 'Services',
         'singular' => 'Service',
     ],

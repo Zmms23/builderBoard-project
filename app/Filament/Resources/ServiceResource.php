@@ -6,9 +6,11 @@ use App\Filament\Resources\ServiceResource\Pages\CreateService;
 use App\Filament\Resources\ServiceResource\Pages\EditService;
 use App\Filament\Resources\ServiceResource\Pages\ListServices;
 use App\Models\Service;
+use App\Settings\CompanySettings;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -18,8 +20,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -71,6 +74,7 @@ class ServiceResource extends Resource
                                     ->numeric()
                                     ->default(0)
                                     ->minValue(0)
+                                    ->prefix(fn (): string => app(CompanySettings::class)->currency->value)
                                     ->required(),
                                 Toggle::make('is_active')
                                     ->label(__('service.fields.is_active'))
@@ -106,16 +110,23 @@ class ServiceResource extends Resource
                     ->wrap(),
                 TextColumn::make('base_price')
                     ->label(__('service.columns.base_price'))
-                    ->formatStateUsing(fn (mixed $state): string => number_format((float) $state, 2))
+                    ->formatStateUsing(fn (mixed $state): string => number_format((float) $state, 2) . ' ' . app(CompanySettings::class)->currency->value)
                     ->sortable(),
-                IconColumn::make('is_active')
+                ToggleColumn::make('is_active')
                     ->label(__('service.columns.is_active'))
-                    ->boolean(),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->label(__('service.columns.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label(__('service.filters.is_active'))
+                    ->placeholder(__('service.filters.all'))
+                    ->trueLabel(__('service.filters.active'))
+                    ->falseLabel(__('service.filters.inactive')),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -148,5 +159,19 @@ class ServiceResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('service.navigation.plural');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        if (! Filament::getTenant()) {
+            return null;
+        }
+
+        return (string) static::getModel()::query()->count();
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return __('service.navigation.badge');
     }
 }
