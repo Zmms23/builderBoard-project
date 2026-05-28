@@ -2,6 +2,7 @@
 
 namespace App\Settings;
 
+use App\Enums\Currency;
 use Spatie\LaravelSettings\Settings;
 
 class CompanySettings extends Settings
@@ -16,7 +17,7 @@ class CompanySettings extends Settings
 
     public ?string $website = null;
 
-    public string $currency = 'GEL';
+    public Currency $currency = Currency::GEL;
 
     public string $primary_color = '#f59e0b';
 
