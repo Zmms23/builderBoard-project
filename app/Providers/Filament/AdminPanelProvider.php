@@ -41,7 +41,6 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
             ->brandLogo(function (): ?string {
                 $settings = app(CompanySettingsData::class);
-
                 if (blank($settings->logo_path)) {
                     return null;
                 }
