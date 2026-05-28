@@ -10,7 +10,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
@@ -82,6 +84,35 @@ class CompanySettings extends SettingsPage
                     ])
                     ->columns(2),
             ]);
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Group::make([
+                    Section::make(__('settings.sections.logo'))
+                        ->description(__('settings.help.logo'))
+                        ->schema([
+                            View::make('filament.pages.company-settings-logo')
+                                ->viewData(fn (): array => [
+                                    'currentLogoUrl' => $this->getCurrentLogoUrl(),
+                                ]),
+                        ]),
+                    $this->getFormContentComponent(),
+                ]),
+            ]);
+    }
+
+    protected function getCurrentLogoUrl(): ?string
+    {
+        $settings = app(CompanySettingsData::class);
+
+        if (blank($settings->logo_path)) {
+            return null;
+        }
+
+        return asset("storage/{$settings->logo_path}");
     }
 
     public function getSavedNotificationTitle(): ?string

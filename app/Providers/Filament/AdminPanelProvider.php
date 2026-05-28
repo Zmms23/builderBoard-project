@@ -38,19 +38,45 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
+
             ->brandLogo(function (): ?string {
-                $settings = app(CompanySettingsData::class);
-                if (blank($settings->logo_path)) {
+                try {
+                    $settings = app(CompanySettingsData::class);
+
+                    if (! filled($settings->logo_path)) {
+                        return null;
+                    }
+
+                    if (! Storage::disk('public')->exists($settings->logo_path)) {
+                        return null;
+                    }
+
+                    return Storage::disk('public')->url($settings->logo_path);
+                } catch (\Throwable $e) {
+                    report($e);
+
                     return null;
                 }
-
-                return Storage::disk('public')->url($settings->logo_path);
             })
+
             ->brandLogoHeight('2rem')
-            ->colors(fn (): array => [
-                'primary' => app(CompanySettingsData::class)->primary_color,
-            ])
+
+            ->colors(function (): array {
+                try {
+                    return [
+                        'primary' => app(CompanySettingsData::class)->primary_color ?? '#f59e0b',
+                    ];
+                } catch (\Throwable $e) {
+                    report($e);
+
+                    return [
+                        'primary' => '#f59e0b',
+                    ];
+                }
+            })
+
             ->userMenuItems([
                 Action::make('locale')
                     ->label(fn (): string => Locale::current()->getLabel())
@@ -66,10 +92,13 @@ class AdminPanelProvider extends PanelProvider
                     ->fillForm(fn (): array => [
                         'locale' => app()->getLocale(),
                     ])
-                    ->action(function (array $data){
+                    ->action(function (array $data) {
                         $locale = Locale::tryFrom($data['locale']);
 
-                        abort_unless($locale !== null && in_array($locale->value, Locale::values(), true), 404);
+                        abort_unless(
+                            $locale !== null && in_array($locale->value, Locale::values(), true),
+                            404
+                        );
 
                         session(['locale' => $locale->value]);
                         app()->setLocale($locale->value);
@@ -78,19 +107,35 @@ class AdminPanelProvider extends PanelProvider
                     })
                     ->sort(91),
             ])
+
             ->tenant(Company::class)
             ->tenantRegistration(RegisterCompany::class)
             ->tenantProfile(EditCompanyProfile::class)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+
+            ->discoverResources(
+                in: app_path('Filament/Resources'),
+                for: 'App\\Filament\\Resources'
+            )
+
+            ->discoverPages(
+                in: app_path('Filament/Pages'),
+                for: 'App\\Filament\\Pages'
+            )
+
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+
+            ->discoverWidgets(
+                in: app_path('Filament/Widgets'),
+                for: 'App\\Filament\\Widgets'
+            )
+
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -103,9 +148,11 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+
             ->plugins([
                 FilamentShieldPlugin::make(),
             ])
+
             ->authMiddleware([
                 Authenticate::class,
             ]);
