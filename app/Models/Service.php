@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['company_id', 'name', 'slug', 'description', 'base_price', 'is_active'])]
+#[Fillable(['company_id', 'name',  'description', 'base_price', 'is_active'])]
 class Service extends Model
 {
     /**
@@ -17,26 +18,12 @@ class Service extends Model
         return $this->belongsTo(Company::class);
     }
 
-    
-
-    /*
-          @return HasMany<Service, $this>
+    /**
+     * @return HasMany<Subservice, $this>
      */
-    /*
-    public function services(): HasMany
+    public function subservices(): HasMany
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(Subservice::class);
     }
-    */
-
-
-    /*
-    public function manager(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'manager_id');
-    }
-
-    */
 }
-
 

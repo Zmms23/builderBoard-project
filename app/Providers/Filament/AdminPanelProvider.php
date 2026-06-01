@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Enums\Locale;
+use App\Filament\Auth\Login;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
 use App\Http\Middleware\SetLocale;
@@ -27,39 +28,32 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\SetPermissionsTeam;
+
+
+
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $tenantDomain = app()->isLocal()
+            ? null
+            : '{tenant}.zura-meskhi-project.test';
+
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->profile()
+            ->login(Login::class)
 
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
 
-            ->brandLogo(function (): ?string {
-                try {
-                    $settings = app(CompanySettingsData::class);
-
-                    if (! filled($settings->logo_path)) {
-                        return null;
-                    }
-
-                    if (! Storage::disk('public')->exists($settings->logo_path)) {
-                        return null;
-                    }
-
-                    return Storage::disk('public')->url($settings->logo_path);
-                } catch (\Throwable $e) {
-                    report($e);
-
-                    return null;
-                }
-            })
+            ->brandLogo(fn (): ?string => $this->settings()?->logo_path? asset('storage/' . $this->settings()->logo_path): asset('images/download.png'))
+               
 
             ->brandLogoHeight('2rem')
 
@@ -78,6 +72,12 @@ class AdminPanelProvider extends PanelProvider
             })
 
             ->userMenuItems([
+                Action::make('currentRole')
+                    ->label(fn (): string => __('user.menu.current_role', ['role' => $this->currentRoleLabel()]))
+                    ->icon(Heroicon::OutlinedShieldCheck)
+                    ->disabled()
+                    ->visible(fn (): bool => filament()->auth()->check())
+                    ->sort(90),
                 Action::make('locale')
                     ->label(fn (): string => Locale::current()->getLabel())
                     ->icon(fn (): Heroicon => Locale::current()->getIcon())
@@ -108,9 +108,15 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(91),
             ])
 
-            ->tenant(Company::class)
-            ->tenantRegistration(RegisterCompany::class)
-            ->tenantProfile(EditCompanyProfile::class)
+                ->domain('zura-meskhi-project.test')
+                ->tenant(Company::class)
+                ->tenantDomain($tenantDomain)
+                ->tenantRegistration(RegisterCompany::class)
+                ->tenantProfile(EditCompanyProfile::class)
+
+            ->tenantMiddleware([
+                    SetPermissionsTeam::class,
+                ], isPersistent: true)
 
             ->discoverResources(
                 in: app_path('Filament/Resources'),
@@ -156,5 +162,37 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    private function settings(): ?CompanySettingsData 
+    {
+        return app(CompanySettingsData::class);   
+    }
+
+    private function currentRoleLabel(): string
+    {
+        $user = filament()->auth()->user();
+
+        if (! $user) {
+            return __('user.roles.none');
+        }
+
+        if (! method_exists($user, 'getRoleNames')) {
+            return __('user.roles.none');
+        }
+
+        $role = $user->getRoleNames()->first();
+
+        if (blank($role)) {
+            return __('user.roles.none');
+        }
+
+        $translatedRole = __('user.roles.' . $role);
+
+        if ($translatedRole === 'user.roles.' . $role) {
+            return Str::of($role)->replace('_', ' ')->headline()->toString();
+        }
+
+        return $translatedRole;
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\Company;
+use App\Models\Permission;
+use App\Models\Role;
 use Spatie\Permission\DefaultTeamResolver;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 return [
 
@@ -35,7 +36,7 @@ return [
          * Eloquent model should be used to retrieve your teams. Of course, it
          * is often just the "Team" model but you may use whatever you like.
          */
-        'team' => null,
+        'team' => Company::class,
 
         /*
          * When using the "HasModels" trait and passing raw IDs to syncModels,

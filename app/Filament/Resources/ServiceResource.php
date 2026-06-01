@@ -5,8 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ServiceResource\Pages\CreateService;
 use App\Filament\Resources\ServiceResource\Pages\EditService;
 use App\Filament\Resources\ServiceResource\Pages\ListServices;
+use App\Filament\Resources\ServiceResource\RelationManagers\SubservicesRelationManager;
 use App\Models\Service;
-use App\Settings\CompanySettings;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,16 +15,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class ServiceResource extends Resource
 {
@@ -42,51 +39,24 @@ class ServiceResource extends Resource
     {
         return $schema
             ->components([
-                Grid::make()
+                Section::make(__('service.sections.details'))
                     ->schema([
-                        Section::make(__('service.sections.details'))
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label(__('service.fields.name'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state ?? ''))),
-                                TextInput::make('slug')
-                                    ->label(__('service.fields.slug'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->alphaDash()
-                                    ->scopedUnique(ignoreRecord: true),
-                                Textarea::make('description')
-                                    ->label(__('service.fields.description'))
-                                    ->rows(4)
-                                    ->columnSpanFull(),
-                            ])
-                            ->columns(2)
-                            ->columnSpan([
-                                'lg' => 2,
-                            ]),
-                        Section::make(__('service.sections.pricing'))
-                            ->schema([
-                                TextInput::make('base_price')
-                                    ->label(__('service.fields.base_price'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0)
-                                    ->prefix(fn (): string => app(CompanySettings::class)->currency->value)
-                                    ->required(),
-                                Toggle::make('is_active')
-                                    ->label(__('service.fields.is_active'))
-                                    ->default(true)
-                                    ->inline(false),
-                            ])
-                            ->columnSpan([
-                                'lg' => 1,
-                            ]),
+                        TextInput::make('name')
+                            ->label(__('service.fields.name'))
+                            ->required()
+                            ->maxLength(255)
+                            ->scopedUnique(ignoreRecord: true),
+                        Textarea::make('description')
+                            ->label(__('service.fields.description'))
+                            ->rows(4)
+                            ->columnSpanFull(),
+                        Toggle::make('is_active')
+                            ->label(__('service.fields.is_active'))
+                            ->default(true)
+                            ->inline(false),
                     ])
                     ->columns([
-                        'lg' => 3,
+                        'lg' => 2,
                     ]),
             ]);
     }
@@ -100,18 +70,10 @@ class ServiceResource extends Resource
                     ->label(__('service.columns.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('slug')
-                    ->label(__('service.columns.slug'))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
                     ->label(__('service.columns.description'))
                     ->limit(40)
                     ->wrap(),
-                TextColumn::make('base_price')
-                    ->label(__('service.columns.base_price'))
-                    ->formatStateUsing(fn (mixed $state): string => number_format((float) $state, 2) . ' ' . app(CompanySettings::class)->currency->value)
-                    ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('service.columns.is_active'))
                     ->sortable(),
@@ -143,6 +105,13 @@ class ServiceResource extends Resource
             'index' => ListServices::route('/'),
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            SubservicesRelationManager::class,
         ];
     }
 
