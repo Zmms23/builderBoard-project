@@ -103,9 +103,10 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(91),
             ])
 
-            ->tenant(Company::class)
-            ->tenantRegistration(RegisterCompany::class)
-            ->tenantProfile(EditCompanyProfile::class)
+                ->tenant(Company::class, slugAttribute: 'slug')
+                ->tenantDomain('{tenant:slug}.zura-meskhi-project.test')
+                ->tenantRegistration(RegisterCompany::class)
+                ->tenantProfile(EditCompanyProfile::class)
 
             ->tenantMiddleware([
                     SetPermissionsTeam::class,
