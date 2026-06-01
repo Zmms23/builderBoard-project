@@ -28,6 +28,9 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\SetPermissionsTeam;
+
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -95,6 +98,10 @@ class AdminPanelProvider extends PanelProvider
             ->tenant(Company::class)
             ->tenantRegistration(RegisterCompany::class)
             ->tenantProfile(EditCompanyProfile::class)
+
+            ->tenantMiddleware([
+                    SetPermissionsTeam::class,
+                ], isPersistent: true)
 
             ->discoverResources(
                 in: app_path('Filament/Resources'),
