@@ -8,7 +8,6 @@ return [
         'name' => 'Name',
         'price' => 'Price',
         'pricing_type' => 'Pricing type',
-        'slug' => 'Slug',
         'unit' => 'Unit',
     ],
     'fields' => [
@@ -18,7 +17,6 @@ return [
         'name' => 'Subservice name',
         'price' => 'Price',
         'pricing_type' => 'Pricing type',
-        'slug' => 'Slug',
         'unit' => 'Unit',
     ],
     'placeholders' => [

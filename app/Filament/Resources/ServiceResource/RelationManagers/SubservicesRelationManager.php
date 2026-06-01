@@ -14,12 +14,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class SubservicesRelationManager extends RelationManager
 {
@@ -33,13 +31,6 @@ class SubservicesRelationManager extends RelationManager
                     ->label(__('subservice.fields.name'))
                     ->required()
                     ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state ?? ''))),
-                TextInput::make('slug')
-                    ->label(__('subservice.fields.slug'))
-                    ->required()
-                    ->maxLength(255)
-                    ->alphaDash()
                     ->scopedUnique(
                         ignoreRecord: true,
                         modifyQueryUsing: fn ($query) => $query->where('service_id', $this->getOwnerRecord()->getKey()),
@@ -87,9 +78,6 @@ class SubservicesRelationManager extends RelationManager
                     ->label(__('subservice.columns.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('slug')
-                    ->label(__('subservice.columns.slug'))
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
                     ->label(__('subservice.columns.description'))
                     ->limit(40)

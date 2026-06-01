@@ -15,26 +15,24 @@ class DemoTenantSeeder extends Seeder
         $originalTeamId = getPermissionsTeamId();
 
         $buildBoard = Company::firstOrCreate(
-            ['slug' => 'buildboard-demo'],
             ['name' => 'BuildBoard Demo']
         );
 
         $renova = Company::firstOrCreate(
-            ['slug' => 'renova-demo'],
             ['name' => 'Renova Demo']
         );
 
-        $admin = User::firstOrCreate(
-            ['email' => 'zura@test.com'],
-            ['name' => 'Zura', 'password' => Hash::make('password')]
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@test.com'],
+            ['name' => 'Admin', 'password' => Hash::make('password')]
         );
 
-        $manager = User::firstOrCreate(
+        $manager = User::updateOrCreate(
             ['email' => 'manager@test.com'],
             ['name' => 'Manager', 'password' => Hash::make('password')]
         );
 
-        $worker = User::firstOrCreate(
+        $worker = User::updateOrCreate(
             ['email' => 'worker@test.com'],
             ['name' => 'Worker', 'password' => Hash::make('password')]
         );

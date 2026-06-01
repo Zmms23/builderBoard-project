@@ -8,7 +8,6 @@ return [
         'name' => 'სახელი',
         'price' => 'ფასი',
         'pricing_type' => 'ფასის ტიპი',
-        'slug' => 'სლაგი',
         'unit' => 'ერთეული',
     ],
     'fields' => [
@@ -18,7 +17,6 @@ return [
         'name' => 'ქვე-სერვისის სახელი',
         'price' => 'ფასი',
         'pricing_type' => 'ფასის ტიპი',
-        'slug' => 'სლაგი',
         'unit' => 'ერთეული',
     ],
     'placeholders' => [

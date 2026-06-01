@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['service_id', 'name', 'slug', 'description', 'price', 'pricing_type', 'unit', 'estimated_duration', 'is_active'])]
+#[Fillable(['service_id', 'name', 'description', 'price', 'pricing_type', 'unit', 'estimated_duration', 'is_active'])]
 class Subservice extends Model
 {
     protected function casts(): array

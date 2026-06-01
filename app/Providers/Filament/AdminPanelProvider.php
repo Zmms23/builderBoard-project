@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Enums\Locale;
+use App\Filament\Auth\Login;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
 use App\Http\Middleware\SetLocale;
@@ -38,12 +39,16 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $tenantDomain = app()->isLocal()
+            ? null
+            : '{tenant}.zura-meskhi-project.test';
+
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
             ->profile()
-            ->login()
+            ->login(Login::class)
 
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
 
@@ -103,8 +108,9 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(91),
             ])
 
-                ->tenant(Company::class, slugAttribute: 'slug')
-                ->tenantDomain('{tenant:slug}.zura-meskhi-project.test')
+                ->domain('zura-meskhi-project.test')
+                ->tenant(Company::class)
+                ->tenantDomain($tenantDomain)
                 ->tenantRegistration(RegisterCompany::class)
                 ->tenantProfile(EditCompanyProfile::class)
 

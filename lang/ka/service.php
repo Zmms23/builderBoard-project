@@ -5,14 +5,12 @@ return [
         'description' => 'აღწერა',
         'is_active' => 'აქტიური',
         'name' => 'სახელი',
-        'slug' => 'სლაგი',
         'updated_at' => 'განახლდა',
     ],
     'fields' => [
         'description' => 'აღწერა',
         'is_active' => 'აქტიურია',
         'name' => 'სერვისის სახელი',
-        'slug' => 'სლაგი',
     ],
     'filters' => [
         'active' => 'მხოლოდ აქტიური',

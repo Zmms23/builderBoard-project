@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['company_id', 'name', 'slug', 'description', 'base_price', 'is_active'])]
+#[Fillable(['company_id', 'name',  'description', 'base_price', 'is_active'])]
 class Service extends Model
 {
     /**

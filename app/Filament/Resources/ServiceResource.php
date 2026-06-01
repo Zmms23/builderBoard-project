@@ -16,14 +16,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class ServiceResource extends Resource
 {
@@ -47,13 +45,6 @@ class ServiceResource extends Resource
                             ->label(__('service.fields.name'))
                             ->required()
                             ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state ?? ''))),
-                        TextInput::make('slug')
-                            ->label(__('service.fields.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->alphaDash()
                             ->scopedUnique(ignoreRecord: true),
                         Textarea::make('description')
                             ->label(__('service.fields.description'))
@@ -79,10 +70,6 @@ class ServiceResource extends Resource
                     ->label(__('service.columns.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('slug')
-                    ->label(__('service.columns.slug'))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
                     ->label(__('service.columns.description'))
                     ->limit(40)
