@@ -27,8 +27,10 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Http\Middleware\SetPermissionsTeam;
+
 
 
 
@@ -65,6 +67,12 @@ class AdminPanelProvider extends PanelProvider
             })
 
             ->userMenuItems([
+                Action::make('currentRole')
+                    ->label(fn (): string => __('user.menu.current_role', ['role' => $this->currentRoleLabel()]))
+                    ->icon(Heroicon::OutlinedShieldCheck)
+                    ->disabled()
+                    ->visible(fn (): bool => filament()->auth()->check())
+                    ->sort(90),
                 Action::make('locale')
                     ->label(fn (): string => Locale::current()->getLabel())
                     ->icon(fn (): Heroicon => Locale::current()->getIcon())
@@ -152,5 +160,32 @@ class AdminPanelProvider extends PanelProvider
     private function settings(): ?CompanySettingsData 
     {
         return app(CompanySettingsData::class);   
+    }
+
+    private function currentRoleLabel(): string
+    {
+        $user = filament()->auth()->user();
+
+        if (! $user) {
+            return __('user.roles.none');
+        }
+
+        if (! method_exists($user, 'getRoleNames')) {
+            return __('user.roles.none');
+        }
+
+        $role = $user->getRoleNames()->first();
+
+        if (blank($role)) {
+            return __('user.roles.none');
+        }
+
+        $translatedRole = __('user.roles.' . $role);
+
+        if ($translatedRole === 'user.roles.' . $role) {
+            return Str::of($role)->replace('_', ' ')->headline()->toString();
+        }
+
+        return $translatedRole;
     }
 }
