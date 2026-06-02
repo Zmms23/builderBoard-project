@@ -2,21 +2,19 @@
 
 namespace App\Models;
 
-use App\Enums\ClientStatus;
-use App\Enums\ClientType;
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['company_id', 'name', 'type', 'status', 'phone', 'email', 'address', 'notes'])]
-class Client extends Model
+#[Fillable(['company_id', 'client_id', 'number', 'title', 'status', 'estimated_price', 'notes'])]
+class Order extends Model
 {
     protected function casts(): array
     {
         return [
-            'status' => ClientStatus::class,
-            'type' => ClientType::class,
+            'estimated_price' => 'decimal:2',
+            'status' => OrderStatus::class,
         ];
     }
 
@@ -29,10 +27,10 @@ class Client extends Model
     }
 
     /**
-     * @return HasMany<Order, $this>
+     * @return BelongsTo<Client, $this>
      */
-    public function orders(): HasMany
+    public function client(): BelongsTo
     {
-        return $this->hasMany(Order::class);
+        return $this->belongsTo(Client::class);
     }
 }
