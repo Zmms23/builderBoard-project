@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ClientStatus;
+use App\Enums\ClientType;
 use App\Filament\Resources\ClientResource\Pages\CreateClient;
 use App\Filament\Resources\ClientResource\Pages\EditClient;
 use App\Filament\Resources\ClientResource\Pages\ListClients;
@@ -10,6 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -17,6 +20,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class ClientResource extends Resource
@@ -41,6 +45,18 @@ class ClientResource extends Resource
                             ->label(__('client.fields.name'))
                             ->required()
                             ->maxLength(255),
+                        Select::make('type')
+                            ->label(__('client.fields.type'))
+                            ->options(ClientType::class)
+                            ->default(ClientType::Person)
+                            ->native(false)
+                            ->required(),
+                        Select::make('status')
+                            ->label(__('client.fields.status'))
+                            ->options(ClientStatus::class)
+                            ->default(ClientStatus::Lead)
+                            ->native(false)
+                            ->required(),
                         TextInput::make('phone')
                             ->label(__('client.fields.phone'))
                             ->tel()
@@ -52,6 +68,10 @@ class ClientResource extends Resource
                         Textarea::make('address')
                             ->label(__('client.fields.address'))
                             ->rows(3)
+                            ->columnSpanFull(),
+                        Textarea::make('notes')
+                            ->label(__('client.fields.notes'))
+                            ->rows(4)
                             ->columnSpanFull(),
                     ])
                     ->columns([
@@ -69,6 +89,16 @@ class ClientResource extends Resource
                     ->label(__('client.columns.name'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('type')
+                    ->label(__('client.columns.type'))
+                    ->formatStateUsing(fn (ClientType | string | null $state): string => static::formatClientType($state))
+                    ->badge()
+                    ->color(fn (ClientType | string | null $state): string => static::clientTypeColor($state)),
+                TextColumn::make('status')
+                    ->label(__('client.columns.status'))
+                    ->formatStateUsing(fn (ClientStatus | string | null $state): string => static::formatClientStatus($state))
+                    ->badge()
+                    ->color(fn (ClientStatus | string | null $state): string => static::clientStatusColor($state)),
                 TextColumn::make('phone')
                     ->label(__('client.columns.phone'))
                     ->searchable(),
@@ -80,12 +110,25 @@ class ClientResource extends Resource
                     ->label(__('client.columns.address'))
                     ->limit(40)
                     ->wrap()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('notes')
+                    ->label(__('client.columns.notes'))
+                    ->limit(40)
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label(__('client.columns.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('type')
+                    ->label(__('client.filters.type'))
+                    ->options(ClientType::class),
+                SelectFilter::make('status')
+                    ->label(__('client.filters.status'))
+                    ->options(ClientStatus::class),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -132,5 +175,46 @@ class ClientResource extends Resource
     public static function getNavigationBadgeTooltip(): ?string
     {
         return __('client.navigation.badge');
+    }
+
+    private static function formatClientType(ClientType | string | null $state): string
+    {
+        return $state instanceof ClientType
+            ? $state->getLabel()
+            : ClientType::tryFrom((string) $state)?->getLabel() ?? '-';
+    }
+
+    private static function clientTypeColor(ClientType | string | null $state): string
+    {
+        $type = $state instanceof ClientType
+            ? $state
+            : ClientType::tryFrom((string) $state);
+
+        return match ($type) {
+            ClientType::Company => 'primary',
+            ClientType::Person => 'gray',
+            default => 'gray',
+        };
+    }
+
+    private static function formatClientStatus(ClientStatus | string | null $state): string
+    {
+        return $state instanceof ClientStatus
+            ? $state->getLabel()
+            : ClientStatus::tryFrom((string) $state)?->getLabel() ?? '-';
+    }
+
+    private static function clientStatusColor(ClientStatus | string | null $state): string
+    {
+        $status = $state instanceof ClientStatus
+            ? $state
+            : ClientStatus::tryFrom((string) $state);
+
+        return match ($status) {
+            ClientStatus::Lead => 'warning',
+            ClientStatus::Active => 'success',
+            ClientStatus::Inactive => 'gray',
+            default => 'gray',
+        };
     }
 }

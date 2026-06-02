@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ClientStatus;
+use App\Enums\ClientType;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Role;
@@ -27,8 +29,11 @@ class DemoTenantSeeder extends Seeder
             ['company_id' => $buildBoard->id, 'email' => 'nino.client@example.com'],
             [
                 'name' => 'Nino Client',
+                'type' => ClientType::Person,
+                'status' => ClientStatus::Active,
                 'phone' => '+995599111222',
                 'address' => 'Tbilisi, Saburtalo',
+                'notes' => 'Interested in apartment renovation progress tracking.',
             ],
         );
 
@@ -36,8 +41,11 @@ class DemoTenantSeeder extends Seeder
             ['company_id' => $buildBoard->id, 'email' => 'giorgi.client@example.com'],
             [
                 'name' => 'Giorgi Client',
+                'type' => ClientType::Person,
+                'status' => ClientStatus::Lead,
                 'phone' => '+995577333444',
                 'address' => 'Tbilisi, Vake',
+                'notes' => 'Needs an estimate before approving the order.',
             ],
         );
 
@@ -45,17 +53,23 @@ class DemoTenantSeeder extends Seeder
             ['company_id' => $renova->id, 'email' => 'mariam.client@example.com'],
             [
                 'name' => 'Mariam Client',
+                'type' => ClientType::Person,
+                'status' => ClientStatus::Active,
                 'phone' => '+995555444333',
                 'address' => 'Batumi, Rustaveli Avenue',
+                'notes' => 'Prefers updates by email.',
             ],
         );
 
         Client::updateOrCreate(
             ['company_id' => $renova->id, 'email' => 'levan.client@example.com'],
             [
-                'name' => 'Levan Client',
+                'name' => 'Levan Construction LLC',
+                'type' => ClientType::Company,
+                'status' => ClientStatus::Inactive,
                 'phone' => '+995591222333',
                 'address' => 'Batumi, Gorgiladze Street',
+                'notes' => 'Corporate client, currently inactive.',
             ],
         );
 
