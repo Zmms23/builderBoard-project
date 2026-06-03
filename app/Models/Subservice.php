@@ -7,15 +7,16 @@ use App\Enums\UnitType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['service_id', 'name', 'description', 'price', 'pricing_type', 'unit', 'estimated_duration', 'is_active'])]
+#[Fillable(['service_id', 'name', 'description', 'price_amount', 'pricing_type', 'unit', 'estimated_duration', 'is_active'])]
 class Subservice extends Model
 {
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
-            'price' => 'decimal:2',
+            'price_amount' => 'integer',
             'pricing_type' => PricingType::class,
             'unit' => UnitType::class,
         ];
@@ -27,5 +28,13 @@ class Subservice extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * @return HasMany<OrderItem, $this>
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

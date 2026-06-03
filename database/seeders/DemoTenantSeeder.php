@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use App\Enums\ClientStatus;
 use App\Enums\ClientType;
+use App\Enums\OrderStatus;
+use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\Order;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -25,7 +28,7 @@ class DemoTenantSeeder extends Seeder
             ['name' => 'Renova Demo']
         );
 
-        Client::updateOrCreate(
+        $ninoClient = Client::updateOrCreate(
             ['company_id' => $buildBoard->id, 'email' => 'nino.client@example.com'],
             [
                 'name' => 'Nino Client',
@@ -37,7 +40,7 @@ class DemoTenantSeeder extends Seeder
             ],
         );
 
-        Client::updateOrCreate(
+        $giorgiClient = Client::updateOrCreate(
             ['company_id' => $buildBoard->id, 'email' => 'giorgi.client@example.com'],
             [
                 'name' => 'Giorgi Client',
@@ -49,7 +52,7 @@ class DemoTenantSeeder extends Seeder
             ],
         );
 
-        Client::updateOrCreate(
+        $mariamClient = Client::updateOrCreate(
             ['company_id' => $renova->id, 'email' => 'mariam.client@example.com'],
             [
                 'name' => 'Mariam Client',
@@ -70,6 +73,39 @@ class DemoTenantSeeder extends Seeder
                 'phone' => '+995591222333',
                 'address' => 'Batumi, Gorgiladze Street',
                 'notes' => 'Corporate client, currently inactive.',
+            ],
+        );
+
+        Order::updateOrCreate(
+            ['company_id' => $buildBoard->id, 'number' => 'ORD-0001'],
+            [
+                'client_id' => $ninoClient->id,
+                'title' => 'Apartment renovation estimate',
+                'status' => OrderStatus::Pending,
+                'estimated_price_amount' => Price::toAmount(18500),
+                'notes' => 'Initial order before choosing detailed subservices.',
+            ],
+        );
+
+        Order::updateOrCreate(
+            ['company_id' => $buildBoard->id, 'number' => 'ORD-0002'],
+            [
+                'client_id' => $giorgiClient->id,
+                'title' => 'Bathroom repair request',
+                'status' => OrderStatus::Draft,
+                'estimated_price_amount' => Price::toAmount(6200),
+                'notes' => 'Waiting for client confirmation.',
+            ],
+        );
+
+        Order::updateOrCreate(
+            ['company_id' => $renova->id, 'number' => 'ORD-0001'],
+            [
+                'client_id' => $mariamClient->id,
+                'title' => 'Kitchen renovation order',
+                'status' => OrderStatus::Approved,
+                'estimated_price_amount' => Price::toAmount(9400),
+                'notes' => 'Approved sample order for Renova Demo.',
             ],
         );
 
