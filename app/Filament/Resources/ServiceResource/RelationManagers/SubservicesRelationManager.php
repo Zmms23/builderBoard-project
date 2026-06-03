@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ServiceResource\RelationManagers;
 use App\Enums\PricingType;
 use App\Enums\UnitType;
 use App\Settings\CompanySettings;
+use App\Support\Money;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -42,12 +43,14 @@ class SubservicesRelationManager extends RelationManager
                     ->rows(4)
                     ->columnSpanFull(),
 
-                TextInput::make('price')
+                TextInput::make('price_amount')
                     ->label(__('subservice.fields.price'))
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
                     ->required(),
 
                 Select::make('pricing_type')
@@ -93,7 +96,7 @@ class SubservicesRelationManager extends RelationManager
                     ->wrap()
                     ->placeholder('-'),
 
-                TextColumn::make('price')
+                TextColumn::make('price_amount')
                     ->label(__('subservice.columns.price'))
                     ->formatStateUsing(fn (int | float | string | null $state): string => $this->formatMoney($state))
                     ->sortable(),
@@ -136,11 +139,7 @@ class SubservicesRelationManager extends RelationManager
 
     private function formatMoney(int | float | string | null $state): string
     {
-        if ($state === null || $state === '') {
-            return '0.00 ' . $this->currency();
-        }
-
-        return number_format((float) $state, 2) . ' ' . $this->currency();
+        return Money::format($state, $this->currency());
     }
 
     private function formatPricingType(PricingType | string | null $state): string

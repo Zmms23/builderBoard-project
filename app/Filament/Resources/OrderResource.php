@@ -10,6 +10,7 @@ use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Models\Client;
 use App\Models\Order;
 use App\Settings\CompanySettings;
+use App\Support\Money;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -68,12 +69,14 @@ class OrderResource extends Resource
                             ->default(OrderStatus::Draft)
                             ->native(false)
                             ->required(),
-                        TextInput::make('estimated_price')
+                        TextInput::make('estimated_price_amount')
                             ->label(__('order.fields.estimated_price'))
                             ->numeric()
                             ->default(0)
                             ->minValue(0)
                             ->prefix(fn (): string => static::currency())
+                            ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
+                            ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
                             ->required(),
                         Textarea::make('notes')
                             ->label(__('order.fields.notes'))
@@ -108,7 +111,7 @@ class OrderResource extends Resource
                     ->formatStateUsing(fn (OrderStatus | string | null $state): string => static::formatOrderStatus($state))
                     ->badge()
                     ->color(fn (OrderStatus | string | null $state): string => static::orderStatusColor($state)),
-                TextColumn::make('estimated_price')
+                TextColumn::make('estimated_price_amount')
                     ->label(__('order.columns.estimated_price'))
                     ->formatStateUsing(fn (int | float | string | null $state): string => static::formatMoney($state))
                     ->sortable(),
@@ -206,11 +209,7 @@ class OrderResource extends Resource
 
     private static function formatMoney(int | float | string | null $state): string
     {
-        if ($state === null || $state === '') {
-            return '0.00 ' . static::currency();
-        }
-
-        return number_format((float) $state, 2) . ' ' . static::currency();
+        return Money::format($state, static::currency());
     }
 
     private static function formatOrderStatus(OrderStatus | string | null $state): string

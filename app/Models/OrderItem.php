@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['order_id', 'subservice_id', 'description', 'quantity', 'unit_price', 'total_price'])]
+#[Fillable(['order_id', 'subservice_id', 'description', 'quantity', 'unit_price_amount', 'total_price_amount'])]
 class OrderItem extends Model
 {
     protected static function booted(): void
     {
         static::saving(function (OrderItem $orderItem): void {
-            $orderItem->total_price = ((float) $orderItem->quantity) * ((float) $orderItem->unit_price);
+            $orderItem->total_price_amount = (int) round(((float) $orderItem->quantity) * ((int) $orderItem->unit_price_amount));
         });
 
         static::saved(function (OrderItem $orderItem): void {
@@ -28,8 +28,8 @@ class OrderItem extends Model
     {
         return [
             'quantity' => 'decimal:2',
-            'unit_price' => 'decimal:2',
-            'total_price' => 'decimal:2',
+            'unit_price_amount' => 'integer',
+            'total_price_amount' => 'integer',
         ];
     }
 

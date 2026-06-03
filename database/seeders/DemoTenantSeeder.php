@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\Order;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -81,7 +82,7 @@ class DemoTenantSeeder extends Seeder
                 'client_id' => $ninoClient->id,
                 'title' => 'Apartment renovation estimate',
                 'status' => OrderStatus::Pending,
-                'estimated_price' => 18500,
+                'estimated_price_amount' => Money::toAmount(18500),
                 'notes' => 'Initial order before choosing detailed subservices.',
             ],
         );
@@ -92,7 +93,7 @@ class DemoTenantSeeder extends Seeder
                 'client_id' => $giorgiClient->id,
                 'title' => 'Bathroom repair request',
                 'status' => OrderStatus::Draft,
-                'estimated_price' => 6200,
+                'estimated_price_amount' => Money::toAmount(6200),
                 'notes' => 'Waiting for client confirmation.',
             ],
         );
@@ -103,7 +104,7 @@ class DemoTenantSeeder extends Seeder
                 'client_id' => $mariamClient->id,
                 'title' => 'Kitchen renovation order',
                 'status' => OrderStatus::Approved,
-                'estimated_price' => 9400,
+                'estimated_price_amount' => Money::toAmount(9400),
                 'notes' => 'Approved sample order for Renova Demo.',
             ],
         );

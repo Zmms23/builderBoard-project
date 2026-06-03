@@ -4,6 +4,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Subservice;
 use App\Settings\CompanySettings;
+use App\Support\Money;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -44,8 +45,10 @@ class ItemsRelationManager extends RelationManager
                         $quantity = $get('quantity') ?: 1;
 
                         $set('description', $subservice->description);
-                        $set('unit_price', $subservice->price);
-                        $set('total_price', $this->calculateTotal($quantity, $subservice->price));
+                        $unitPrice = Money::fromAmount($subservice->price_amount);
+
+                        $set('unit_price_amount', $unitPrice);
+                        $set('total_price_amount', $this->calculateTotal($quantity, $unitPrice));
                     }),
                 Textarea::make('description')
                     ->label(__('order_item.fields.description'))
@@ -58,25 +61,29 @@ class ItemsRelationManager extends RelationManager
                     ->minValue(0.01)
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Get $get, Set $set): void {
-                        $set('total_price', $this->calculateTotal($get('quantity'), $get('unit_price')));
+                        $set('total_price_amount', $this->calculateTotal($get('quantity'), $get('unit_price_amount')));
                     })
                     ->required(),
-                TextInput::make('unit_price')
+                TextInput::make('unit_price_amount')
                     ->label(__('order_item.fields.unit_price'))
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Get $get, Set $set): void {
-                        $set('total_price', $this->calculateTotal($get('quantity'), $get('unit_price')));
+                        $set('total_price_amount', $this->calculateTotal($get('quantity'), $get('unit_price_amount')));
                     })
                     ->required(),
-                TextInput::make('total_price')
+                TextInput::make('total_price_amount')
                     ->label(__('order_item.fields.total_price'))
                     ->numeric()
                     ->default(0)
                     ->prefix(fn (): string => $this->currency())
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
                     ->disabled()
                     ->dehydrated()
                     ->required(),
@@ -105,13 +112,13 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('quantity')
                     ->label(__('order_item.columns.quantity'))
                     ->sortable(),
-                TextColumn::make('unit_price')
+                TextColumn::make('unit_price_amount')
                     ->label(__('order_item.columns.unit_price'))
-                    ->money($this->currency())
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::format($state, $this->currency()))
                     ->sortable(),
-                TextColumn::make('total_price')
+                TextColumn::make('total_price_amount')
                     ->label(__('order_item.columns.total_price'))
-                    ->money($this->currency())
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::format($state, $this->currency()))
                     ->sortable(),
             ])
             ->headerActions([

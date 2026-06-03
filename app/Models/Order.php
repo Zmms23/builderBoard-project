@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['company_id', 'client_id', 'number', 'title', 'status', 'estimated_price', 'notes'])]
+#[Fillable(['company_id', 'client_id', 'number', 'title', 'status', 'estimated_price_amount', 'notes'])]
 class Order extends Model
 {
     protected function casts(): array
     {
         return [
-            'estimated_price' => 'decimal:2',
+            'estimated_price_amount' => 'integer',
             'status' => OrderStatus::class,
         ];
     }
@@ -46,7 +46,7 @@ class Order extends Model
     public function refreshEstimatedPrice(): void
     {
         $this->forceFill([
-            'estimated_price' => $this->items()->sum('total_price'),
+            'estimated_price_amount' => $this->items()->sum('total_price_amount'),
         ])->save();
     }
 }
