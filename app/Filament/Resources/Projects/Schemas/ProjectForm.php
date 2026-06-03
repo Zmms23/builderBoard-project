@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProjectForm
 {
@@ -110,10 +111,12 @@ class ProjectForm
         return Order::query()
             ->where('company_id', $tenant->getKey())
             ->where('status', OrderStatus::Approved->value)
-            ->where(function ($query) use ($record): void {
-                $query
-                    ->whereDoesntHave('project')
-                    ->when($record, fn ($query) => $query->orWhereKey($record->order_id));
+            ->where(function (Builder $query) use ($record): void {
+                $query->whereDoesntHave('project');
+
+                if ($record?->order_id) {
+                    $query->orWhere('id', $record->order_id);
+                }
             })
             ->orderBy('number')
             ->get()
