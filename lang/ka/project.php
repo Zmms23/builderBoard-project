@@ -39,6 +39,27 @@ return [
         'on_hold' => 'შეჩერებული',
         'planning' => 'დაგეგმვა',
     ],
+    'timeline' => [
+        'columns' => [
+            'ends_at' => 'დასრულება',
+            'name' => 'ეტაპი',
+            'notes' => 'შენიშვნები',
+            'sort' => 'რიგი',
+            'starts_at' => 'დაწყება',
+            'status' => 'სტატუსი',
+        ],
+        'fields' => [
+            'ends_at' => 'დასრულება',
+            'name' => 'ეტაპის სახელი',
+            'notes' => 'შენიშვნები',
+            'sort' => 'რიგი',
+            'starts_at' => 'დაწყება',
+            'status' => 'სტატუსი',
+        ],
+        'filters' => [
+            'status' => 'სტატუსი',
+        ],
+    ],
     'timeline_stage_statuses' => [
         'blocked' => 'დაბლოკილი',
         'completed' => 'დასრულებული',

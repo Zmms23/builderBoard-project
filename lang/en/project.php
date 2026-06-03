@@ -39,6 +39,27 @@ return [
         'on_hold' => 'On hold',
         'planning' => 'Planning',
     ],
+    'timeline' => [
+        'columns' => [
+            'ends_at' => 'Ends at',
+            'name' => 'Stage',
+            'notes' => 'Notes',
+            'sort' => 'Order',
+            'starts_at' => 'Starts at',
+            'status' => 'Status',
+        ],
+        'fields' => [
+            'ends_at' => 'Ends at',
+            'name' => 'Stage name',
+            'notes' => 'Notes',
+            'sort' => 'Order',
+            'starts_at' => 'Starts at',
+            'status' => 'Status',
+        ],
+        'filters' => [
+            'status' => 'Status',
+        ],
+    ],
     'timeline_stage_statuses' => [
         'blocked' => 'Blocked',
         'completed' => 'Completed',
