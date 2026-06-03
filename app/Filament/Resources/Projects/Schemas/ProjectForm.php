@@ -34,7 +34,7 @@ class ProjectForm
                             ->native(false)
                             ->live()
                             ->unique(ignoreRecord: true)
-                            ->afterStateUpdated(function (Set $set, mixed $state): void {
+                            ->afterStateUpdated(function (Set $set, int | string | null $state): void {
                                 $order = Order::query()
                                     ->with('client')
                                     ->find($state);
@@ -113,7 +113,7 @@ class ProjectForm
             ->where(function ($query) use ($record): void {
                 $query
                     ->whereDoesntHave('project')
-                    ->when($record, fn ($query): mixed => $query->orWhereKey($record->order_id));
+                    ->when($record, fn ($query) => $query->orWhereKey($record->order_id));
             })
             ->orderBy('number')
             ->get()

@@ -29,9 +29,8 @@ class RegisterCompany extends RegisterTenant
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array{name: string}  $data
      */
-   
     protected function handleRegistration(array $data): Company
     {
         $company = Company::create($data);
