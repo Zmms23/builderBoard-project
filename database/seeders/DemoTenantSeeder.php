@@ -5,10 +5,12 @@ namespace Database\Seeders;
 use App\Enums\ClientStatus;
 use App\Enums\ClientType;
 use App\Enums\OrderStatus;
+use App\Enums\ProjectStatus;
 use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Order;
+use App\Models\Project;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -98,7 +100,7 @@ class DemoTenantSeeder extends Seeder
             ],
         );
 
-        Order::updateOrCreate(
+        $renovaKitchenOrder = Order::updateOrCreate(
             ['company_id' => $renova->id, 'number' => 'ORD-0001'],
             [
                 'client_id' => $mariamClient->id,
@@ -106,6 +108,20 @@ class DemoTenantSeeder extends Seeder
                 'status' => OrderStatus::Approved,
                 'estimated_price_amount' => Price::toAmount(9400),
                 'notes' => 'Approved sample order for Renova Demo.',
+            ],
+        );
+
+        Project::updateOrCreate(
+            ['order_id' => $renovaKitchenOrder->id],
+            [
+                'company_id' => $renova->id,
+                'client_id' => $mariamClient->id,
+                'title' => 'Kitchen renovation project',
+                'status' => ProjectStatus::Active,
+                'deadline' => now()->addWeeks(6)->toDateString(),
+                'progress' => 35,
+                'budget_amount' => $renovaKitchenOrder->estimated_price_amount,
+                'notes' => 'Sample project created from an approved order.',
             ],
         );
 
