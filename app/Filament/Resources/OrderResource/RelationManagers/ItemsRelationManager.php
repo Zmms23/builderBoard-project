@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Helpers\Price;
 use App\Models\Subservice;
 use App\Settings\CompanySettings;
-use App\Support\Money;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -45,7 +45,7 @@ class ItemsRelationManager extends RelationManager
                         $quantity = $get('quantity') ?: 1;
 
                         $set('description', $subservice->description);
-                        $unitPrice = Money::fromAmount($subservice->price_amount);
+                        $unitPrice = Price::fromAmount($subservice->price_amount);
 
                         $set('unit_price_amount', $unitPrice);
                         $set('total_price_amount', $this->calculateTotal($quantity, $unitPrice));
@@ -70,8 +70,8 @@ class ItemsRelationManager extends RelationManager
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Get $get, Set $set): void {
                         $set('total_price_amount', $this->calculateTotal($get('quantity'), $get('unit_price_amount')));
@@ -82,8 +82,8 @@ class ItemsRelationManager extends RelationManager
                     ->numeric()
                     ->default(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
                     ->disabled()
                     ->dehydrated()
                     ->required(),
@@ -114,11 +114,11 @@ class ItemsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('unit_price_amount')
                     ->label(__('order_item.columns.unit_price'))
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::format($state, $this->currency()))
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::format($state, $this->currency()))
                     ->sortable(),
                 TextColumn::make('total_price_amount')
                     ->label(__('order_item.columns.total_price'))
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::format($state, $this->currency()))
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::format($state, $this->currency()))
                     ->sortable(),
             ])
             ->headerActions([

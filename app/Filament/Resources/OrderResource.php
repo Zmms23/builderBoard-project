@@ -7,10 +7,10 @@ use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
+use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Order;
 use App\Settings\CompanySettings;
-use App\Support\Money;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -75,8 +75,8 @@ class OrderResource extends Resource
                             ->default(0)
                             ->minValue(0)
                             ->prefix(fn (): string => static::currency())
-                            ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
-                            ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
+                            ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
+                            ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
                             ->required(),
                         Textarea::make('notes')
                             ->label(__('order.fields.notes'))
@@ -209,7 +209,7 @@ class OrderResource extends Resource
 
     private static function formatMoney(int | float | string | null $state): string
     {
-        return Money::format($state, static::currency());
+        return Price::format($state, static::currency());
     }
 
     private static function formatOrderStatus(OrderStatus | string | null $state): string

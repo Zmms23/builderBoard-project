@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Support;
+namespace App\Helpers;
 
-class Money
+class Price
 {
     public static function toAmount(int | float | string | null $value): int
     {

@@ -4,8 +4,8 @@ namespace App\Filament\Resources\ServiceResource\RelationManagers;
 
 use App\Enums\PricingType;
 use App\Enums\UnitType;
+use App\Helpers\Price;
 use App\Settings\CompanySettings;
-use App\Support\Money;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -49,8 +49,8 @@ class SubservicesRelationManager extends RelationManager
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Money::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Money::toAmount($state))
+                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
                     ->required(),
 
                 Select::make('pricing_type')
@@ -139,7 +139,7 @@ class SubservicesRelationManager extends RelationManager
 
     private function formatMoney(int | float | string | null $state): string
     {
-        return Money::format($state, $this->currency());
+        return Price::format($state, $this->currency());
     }
 
     private function formatPricingType(PricingType | string | null $state): string
