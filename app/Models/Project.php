@@ -52,4 +52,12 @@ class Project extends Model
     {
         return $this->hasMany(ProjectTimelineStage::class)->orderBy('sort');
     }
+
+    /**
+     * @return HasMany<ProjectTask, $this>
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ProjectTask::class)->orderBy('sort');
+    }
 }

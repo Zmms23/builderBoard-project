@@ -66,4 +66,33 @@ return [
         'in_progress' => 'In progress',
         'pending' => 'Pending',
     ],
+    'tasks' => [
+        'columns' => [
+            'assignee' => 'Responsible',
+            'budget' => 'Budget',
+            'deadline' => 'Deadline',
+            'name' => 'Task',
+            'notes' => 'Notes',
+            'sort' => 'Order',
+            'status' => 'Status',
+        ],
+        'fields' => [
+            'assignee' => 'Responsible',
+            'budget' => 'Budget',
+            'deadline' => 'Deadline',
+            'name' => 'Task name',
+            'notes' => 'Notes',
+            'sort' => 'Order',
+            'status' => 'Status',
+        ],
+        'filters' => [
+            'status' => 'Status',
+        ],
+    ],
+    'task_statuses' => [
+        'blocked' => 'Blocked',
+        'done' => 'Done',
+        'in_progress' => 'In progress',
+        'todo' => 'To do',
+    ],
 ];
