@@ -14,6 +14,14 @@ class OrderItem extends Model
         static::saving(function (OrderItem $orderItem): void {
             $orderItem->total_price = ((float) $orderItem->quantity) * ((float) $orderItem->unit_price);
         });
+
+        static::saved(function (OrderItem $orderItem): void {
+            $orderItem->order?->refreshEstimatedPrice();
+        });
+
+        static::deleted(function (OrderItem $orderItem): void {
+            $orderItem->order?->refreshEstimatedPrice();
+        });
     }
 
     protected function casts(): array

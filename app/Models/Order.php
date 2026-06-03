@@ -42,4 +42,11 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function refreshEstimatedPrice(): void
+    {
+        $this->forceFill([
+            'estimated_price' => $this->items()->sum('total_price'),
+        ])->save();
+    }
 }
