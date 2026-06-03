@@ -39,4 +39,10 @@ return [
         'on_hold' => 'On hold',
         'planning' => 'Planning',
     ],
+    'timeline_stage_statuses' => [
+        'blocked' => 'Blocked',
+        'completed' => 'Completed',
+        'in_progress' => 'In progress',
+        'pending' => 'Pending',
+    ],
 ];

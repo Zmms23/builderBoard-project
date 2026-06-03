@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['company_id', 'order_id', 'client_id', 'title', 'status', 'deadline', 'progress', 'budget_amount', 'notes'])]
 class Project extends Model
@@ -42,5 +43,13 @@ class Project extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * @return HasMany<ProjectTimelineStage, $this>
+     */
+    public function timelineStages(): HasMany
+    {
+        return $this->hasMany(ProjectTimelineStage::class)->orderBy('sort');
     }
 }

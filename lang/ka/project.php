@@ -39,4 +39,10 @@ return [
         'on_hold' => 'შეჩერებული',
         'planning' => 'დაგეგმვა',
     ],
+    'timeline_stage_statuses' => [
+        'blocked' => 'დაბლოკილი',
+        'completed' => 'დასრულებული',
+        'in_progress' => 'მიმდინარეობს',
+        'pending' => 'მოლოდინში',
+    ],
 ];
