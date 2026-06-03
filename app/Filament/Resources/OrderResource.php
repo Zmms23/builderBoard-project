@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Models\Client;
 use App\Models\Order;
 use App\Settings\CompanySettings;
@@ -232,5 +233,12 @@ class OrderResource extends Resource
             OrderStatus::Rejected => 'danger',
             default => 'gray',
         };
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ItemsRelationManager::class,
+        ];
     }
 }
