@@ -2,12 +2,9 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
-use App\Enums\OrderStatus;
 use App\Enums\ProjectStatus;
 use App\Helpers\Price;
 use App\Models\Client;
-use App\Models\Order;
-use App\Models\Project;
 use App\Settings\CompanySettings;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -15,9 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
 
 class ProjectForm
 {
@@ -27,33 +22,11 @@ class ProjectForm
             ->components([
                 Section::make(__('project.sections.details'))
                     ->schema([
-                        Select::make('order_id')
-                            ->label(__('project.fields.order'))
-                            ->options(fn (?Project $record = null): array => static::orderOptions($record))
-                            ->searchable()
-                            ->preload()
-                            ->native(false)
-                            ->live()
-                            ->unique(ignoreRecord: true)
-                            ->afterStateUpdated(function (Set $set, int | string | null $state): void {
-                                $order = Order::query()
-                                    ->with('client')
-                                    ->find($state);
-
-                                if (! $order) {
-                                    return;
-                                }
-
-                                $set('client_id', $order->client_id);
-                                $set('title', $order->title);
-                                $set('budget_amount', Price::fromAmount($order->estimated_price_amount));
-                            })
-                            ->required(),
                         Select::make('client_id')
                             ->label(__('project.fields.client'))
                             ->options(fn (): array => static::clientOptions())
-                            ->disabled()
-                            ->dehydrated()
+                            ->searchable()
+                            ->preload()
                             ->native(false)
                             ->required(),
                         TextInput::make('title')
@@ -95,35 +68,6 @@ class ProjectForm
                         'lg' => 2,
                     ]),
             ]);
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private static function orderOptions(?Project $record = null): array
-    {
-        $tenant = Filament::getTenant();
-
-        if (! $tenant) {
-            return [];
-        }
-
-        return Order::query()
-            ->where('company_id', $tenant->getKey())
-            ->where('status', OrderStatus::Approved->value)
-            ->where(function (Builder $query) use ($record): void {
-                $query->whereDoesntHave('project');
-
-                if ($record?->order_id) {
-                    $query->orWhere('id', $record->order_id);
-                }
-            })
-            ->orderBy('number')
-            ->get()
-            ->mapWithKeys(fn (Order $order): array => [
-                $order->id => "{$order->number} - {$order->title}",
-            ])
-            ->all();
     }
 
     /**
