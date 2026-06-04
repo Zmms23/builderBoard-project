@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['project_id', 'assigned_to_id', 'name', 'status', 'sort', 'deadline', 'budget_amount', 'notes'])]
+#[Fillable(['project_id', 'order_id', 'assigned_to_id', 'name', 'status', 'sort', 'deadline', 'budget_amount', 'notes'])]
 class ProjectTask extends Model
 {
     protected function casts(): array
@@ -26,6 +26,14 @@ class ProjectTask extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * @return BelongsTo<Order, $this>
+     */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     /**
