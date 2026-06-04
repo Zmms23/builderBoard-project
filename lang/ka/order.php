@@ -2,9 +2,9 @@
 
 return [
     'columns' => [
-        'deadline' => 'Deadline',
-        'progress' => 'Progress',
-        'project' => 'Project',
+        'deadline' => 'დედლაინი',
+        'progress' => 'პროგრესი',
+        'project' => 'პროექტი',
         'client' => 'კლიენტი',
         'created_at' => 'შეიქმნა',
         'estimated_price' => 'სავარაუდო ფასი',
@@ -13,9 +13,9 @@ return [
         'title' => 'სათაური',
     ],
     'fields' => [
-        'deadline' => 'Deadline',
-        'progress' => 'Progress',
-        'project' => 'Project',
+        'deadline' => 'დედლაინი',
+        'progress' => 'პროგრესი',
+        'project' => 'პროექტი',
         'client' => 'კლიენტი',
         'estimated_price' => 'სავარაუდო ფასი',
         'notes' => 'შენიშვნები',
@@ -24,7 +24,7 @@ return [
         'title' => 'შეკვეთის სათაური',
     ],
     'filters' => [
-        'project' => 'Project',
+        'project' => 'პროექტი',
         'client' => 'კლიენტი',
         'status' => 'სტატუსი',
     ],

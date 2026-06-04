@@ -60,6 +60,22 @@
             </button>
         </form>
 
+        @php
+            $languages = [
+                ['code' => 'en', 'name' => 'English', 'flag' => 'gb'],
+                ['code' => 'ka', 'name' => 'ქართული', 'flag' => 'ge'],
+            ];
+
+            $currentLanguage = collect($languages)->firstWhere('code', app()->getLocale()) ?? $languages[0];
+        @endphp
+
+        @include('filament-language-switcher::language-switcher', [
+            'otherLanguages' => $languages,
+            'currentLanguage' => $currentLanguage,
+            'showFlags' => true,
+            'floating' => true,
+        ])
+
         <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-gray-400">
             Demo accounts: <span class="font-medium text-white">admin@test.com</span>,
             <span class="font-medium text-white">manager@test.com</span>,
