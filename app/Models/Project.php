@@ -60,4 +60,12 @@ class Project extends Model
     {
         return $this->hasMany(ProjectTask::class)->orderBy('sort');
     }
+    /**
+     * @return HasMany<Order, $this>
+     */
+    public function orders(): HasMany {
+        return $this->hasMany(Order::class);
+    }
+    
+
 }

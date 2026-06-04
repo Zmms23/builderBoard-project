@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['company_id', 'client_id', 'number', 'title', 'status', 'estimated_price_amount', 'notes'])]
+
+
+#[Fillable(['company_id', 'project_id', 'client_id', 'number', 'title', 'status', 'deadline', 'progress', 'estimated_price_amount', 'notes'])]
 class Order extends Model
 {
     protected function casts(): array
@@ -17,6 +18,8 @@ class Order extends Model
         return [
             'estimated_price_amount' => 'integer',
             'status' => OrderStatus::class,
+            'deadline' => 'date',
+            'progress' => 'integer',
         ];
     }
 
@@ -47,10 +50,13 @@ class Order extends Model
     /**
      * @return HasOne<Project, $this>
      */
-    public function project(): HasOne
-    {
-        return $this->hasOne(Project::class);
-    }
+    /**
+     * @return BelongsTo<Project, $this>
+     */
+        public function project(): BelongsTo
+        {
+            return $this->belongsTo(Project::class);
+        }
 
     public function refreshEstimatedPrice(): void
     {
