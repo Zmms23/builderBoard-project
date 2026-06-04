@@ -7,7 +7,6 @@ use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-use App\Filament\Resources\OrderResource\RelationManagers\TasksRelationManager;
 use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Order;
@@ -314,7 +313,6 @@ class OrderResource extends Resource
     {
         return [
             ItemsRelationManager::class,
-            TasksRelationManager::class,
         ];
     }
 }

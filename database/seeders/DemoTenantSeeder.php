@@ -6,14 +6,12 @@ use App\Enums\ClientStatus;
 use App\Enums\ClientType;
 use App\Enums\OrderStatus;
 use App\Enums\ProjectStatus;
-use App\Enums\ProjectTaskStatus;
 use App\Enums\ProjectTimelineStageStatus;
 use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Order;
 use App\Models\Project;
-use App\Models\ProjectTask;
 use App\Models\ProjectTimelineStage;
 use App\Models\Role;
 use App\Models\User;
@@ -175,30 +173,6 @@ class DemoTenantSeeder extends Seeder
         $renova->members()->syncWithoutDetaching([
             $manager->id,
         ]);
-
-        ProjectTask::updateOrCreate(
-            ['project_id' => $renovaKitchenProject->id, 'name' => 'Confirm electrical points'],
-            [
-                'assigned_to_id' => $manager->id,
-                'status' => ProjectTaskStatus::InProgress,
-                'sort' => 1,
-                'deadline' => now()->addDays(4)->toDateString(),
-                'budget_amount' => Price::toAmount(450),
-                'notes' => 'Confirm socket locations before wall finishing starts.',
-            ],
-        );
-
-        ProjectTask::updateOrCreate(
-            ['project_id' => $renovaKitchenProject->id, 'name' => 'Order kitchen tiles'],
-            [
-                'assigned_to_id' => $manager->id,
-                'status' => ProjectTaskStatus::Todo,
-                'sort' => 2,
-                'deadline' => now()->addWeek()->toDateString(),
-                'budget_amount' => Price::toAmount(1200),
-                'notes' => 'Client approved the first tile option.',
-            ],
-        );
 
         try {
             setPermissionsTeamId($buildBoard->id);
