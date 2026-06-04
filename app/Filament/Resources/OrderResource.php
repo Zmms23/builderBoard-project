@@ -10,16 +10,19 @@ use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Order;
+use App\Models\Project;
 use App\Settings\CompanySettings;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -52,6 +55,23 @@ class OrderResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->scopedUnique(ignoreRecord: true),
+                        Select::make('project_id')
+                            ->label(__('order.fields.project'))
+                            ->options(fn (): array => static::projectOptions())
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, int | string | null $state): void {
+                                $project = Project::query()->find($state);
+
+                                if (! $project) {
+                                    return;
+                                }
+
+                                $set('client_id', $project->client_id);
+                            })
+                            ->required(),
                         TextInput::make('title')
                             ->label(__('order.fields.title'))
                             ->required()
@@ -61,6 +81,8 @@ class OrderResource extends Resource
                             ->options(fn (): array => static::clientOptions())
                             ->searchable()
                             ->preload()
+                            ->disabled()
+                            ->dehydrated()
                             ->native(false)
                             ->required(),
                         Select::make('status')
@@ -68,6 +90,17 @@ class OrderResource extends Resource
                             ->options(OrderStatus::class)
                             ->default(OrderStatus::Draft)
                             ->native(false)
+                            ->required(),
+                        DatePicker::make('deadline')
+                            ->label(__('order.fields.deadline'))
+                            ->native(false),
+                        TextInput::make('progress')
+                            ->label(__('order.fields.progress'))
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(0)
+                            ->suffix('%')
                             ->required(),
                         TextInput::make('estimated_price_amount')
                             ->label(__('order.fields.estimated_price'))
@@ -102,6 +135,10 @@ class OrderResource extends Resource
                     ->label(__('order.columns.title'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('project.title')
+                    ->label(__('order.columns.project'))
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('client.name')
                     ->label(__('order.columns.client'))
                     ->searchable()
@@ -115,6 +152,14 @@ class OrderResource extends Resource
                     ->label(__('order.columns.estimated_price'))
                     ->formatStateUsing(fn (int | float | string | null $state): string => static::formatMoney($state))
                     ->sortable(),
+                TextColumn::make('deadline')
+                    ->label(__('order.columns.deadline'))
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('progress')
+                    ->label(__('order.columns.progress'))
+                    ->suffix('%')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('order.columns.created_at'))
                     ->dateTime()
@@ -122,6 +167,9 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('project_id')
+                    ->label(__('order.filters.project'))
+                    ->options(fn (): array => static::projectOptions()),
                 SelectFilter::make('client_id')
                     ->label(__('order.filters.client'))
                     ->options(fn (): array => static::clientOptions()),
@@ -176,6 +224,33 @@ class OrderResource extends Resource
         return __('order.navigation.badge');
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private static function projectOptions(): array
+    {
+        $tenant = Filament::getTenant();
+
+        if (! $tenant) {
+            return [];
+        }
+
+        return Project::query()
+            ->with('client')
+            ->where('company_id', $tenant->getKey())
+            ->orderBy('title')
+            ->get()
+            ->mapWithKeys(fn (Project $project): array => [
+                $project->id => $project->client
+                    ? "{$project->title} - {$project->client->name}"
+                    : $project->title,
+            ])
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
     private static function clientOptions(): array
     {
         $tenant = Filament::getTenant();
