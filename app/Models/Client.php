@@ -35,4 +35,12 @@ class Client extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * @return HasMany<Project, $this>
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
 }

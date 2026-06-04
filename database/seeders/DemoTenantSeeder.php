@@ -5,10 +5,16 @@ namespace Database\Seeders;
 use App\Enums\ClientStatus;
 use App\Enums\ClientType;
 use App\Enums\OrderStatus;
+use App\Enums\ProjectStatus;
+use App\Enums\ProjectTaskStatus;
+use App\Enums\ProjectTimelineStageStatus;
 use App\Helpers\Price;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Order;
+use App\Models\Project;
+use App\Models\ProjectTask;
+use App\Models\ProjectTimelineStage;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -98,7 +104,7 @@ class DemoTenantSeeder extends Seeder
             ],
         );
 
-        Order::updateOrCreate(
+        $renovaKitchenOrder = Order::updateOrCreate(
             ['company_id' => $renova->id, 'number' => 'ORD-0001'],
             [
                 'client_id' => $mariamClient->id,
@@ -106,6 +112,42 @@ class DemoTenantSeeder extends Seeder
                 'status' => OrderStatus::Approved,
                 'estimated_price_amount' => Price::toAmount(9400),
                 'notes' => 'Approved sample order for Renova Demo.',
+            ],
+        );
+
+        $renovaKitchenProject = Project::updateOrCreate(
+            ['order_id' => $renovaKitchenOrder->id],
+            [
+                'company_id' => $renova->id,
+                'client_id' => $mariamClient->id,
+                'title' => 'Kitchen renovation project',
+                'status' => ProjectStatus::Active,
+                'deadline' => now()->addWeeks(6)->toDateString(),
+                'progress' => 35,
+                'budget_amount' => $renovaKitchenOrder->estimated_price_amount,
+                'notes' => 'Sample project created from an approved order.',
+            ],
+        );
+
+        ProjectTimelineStage::updateOrCreate(
+            ['project_id' => $renovaKitchenProject->id, 'name' => 'Planning'],
+            [
+                'status' => ProjectTimelineStageStatus::Completed,
+                'sort' => 1,
+                'starts_at' => now()->subWeeks(2)->toDateString(),
+                'ends_at' => now()->subWeek()->toDateString(),
+                'notes' => 'Initial measurements and schedule confirmed.',
+            ],
+        );
+
+        ProjectTimelineStage::updateOrCreate(
+            ['project_id' => $renovaKitchenProject->id, 'name' => 'Demolition'],
+            [
+                'status' => ProjectTimelineStageStatus::InProgress,
+                'sort' => 2,
+                'starts_at' => now()->subDays(3)->toDateString(),
+                'ends_at' => now()->addDays(2)->toDateString(),
+                'notes' => 'Old cabinets and tiles are being removed.',
             ],
         );
 
@@ -133,6 +175,30 @@ class DemoTenantSeeder extends Seeder
         $renova->members()->syncWithoutDetaching([
             $manager->id,
         ]);
+
+        ProjectTask::updateOrCreate(
+            ['project_id' => $renovaKitchenProject->id, 'name' => 'Confirm electrical points'],
+            [
+                'assigned_to_id' => $manager->id,
+                'status' => ProjectTaskStatus::InProgress,
+                'sort' => 1,
+                'deadline' => now()->addDays(4)->toDateString(),
+                'budget_amount' => Price::toAmount(450),
+                'notes' => 'Confirm socket locations before wall finishing starts.',
+            ],
+        );
+
+        ProjectTask::updateOrCreate(
+            ['project_id' => $renovaKitchenProject->id, 'name' => 'Order kitchen tiles'],
+            [
+                'assigned_to_id' => $manager->id,
+                'status' => ProjectTaskStatus::Todo,
+                'sort' => 2,
+                'deadline' => now()->addWeek()->toDateString(),
+                'budget_amount' => Price::toAmount(1200),
+                'notes' => 'Client approved the first tile option.',
+            ],
+        );
 
         try {
             setPermissionsTeamId($buildBoard->id);

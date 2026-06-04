@@ -35,7 +35,7 @@ class ItemsRelationManager extends RelationManager
                     ->native(false)
                     ->required()
                     ->live()
-                    ->afterStateUpdated(function (Get $get, Set $set, mixed $state): void {
+                    ->afterStateUpdated(function (Get $get, Set $set, int | string | null $state): void {
                         $subservice = Subservice::find($state);
 
                         if (! $subservice) {
