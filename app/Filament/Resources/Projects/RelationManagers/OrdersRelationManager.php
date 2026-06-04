@@ -17,7 +17,25 @@ class OrdersRelationManager extends RelationManager
     {
         return $table
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->fillForm(fn (): array => $this->orderDefaults())
+                    ->mutateDataUsing(fn (array $data): array => [
+                        ...$data,
+                        ...$this->orderDefaults(),
+                    ]),
             ]);
+    }
+
+    /**
+     * @return array{project_id: int|string|null, client_id: int|string|null}
+     */
+    private function orderDefaults(): array
+    {
+        $project = $this->getOwnerRecord();
+
+        return [
+            'project_id' => $project->getKey(),
+            'client_id' => $project->client_id,
+        ];
     }
 }
