@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\TasksRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\TimelineStagesRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
@@ -42,6 +43,7 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
+            OrdersRelationManager::class,
             TimelineStagesRelationManager::class,
             TasksRelationManager::class,
         ];
