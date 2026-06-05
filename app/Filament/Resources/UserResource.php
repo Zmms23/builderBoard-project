@@ -35,6 +35,12 @@ class UserResource extends Resource
             ->components([
                 Section::make(__('user.sections.details'))
                     ->schema([
+                        TextInput::make('company_name')
+                            ->label(__('user.fields.company'))
+                            ->default(fn (): string => (string) (Filament::getTenant()?->getAttribute('name') ?? ''))
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
                         TextInput::make('name')
                             ->label(__('user.fields.name'))
                             ->required()

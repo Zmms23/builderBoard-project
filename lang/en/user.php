@@ -10,6 +10,7 @@ return [
         'details' => 'Member details',
     ],
     'fields' => [
+        'company' => 'Company',
         'name' => 'Name',
         'email' => 'Email',
         'password' => 'Password',

@@ -10,6 +10,7 @@ return [
         'details' => 'წევრის დეტალები',
     ],
     'fields' => [
+        'company' => 'კომპანია',
         'name' => 'სახელი',
         'email' => 'იმეილი',
         'password' => 'პაროლი',
