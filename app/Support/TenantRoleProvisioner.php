@@ -6,16 +6,21 @@ use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Support\Collection;
+use Spatie\Permission\PermissionRegistrar;
 
 class TenantRoleProvisioner
 {
     public function provision(Company $company): void
     {
+        $this->forgetCachedPermissions();
+
         $originalTeamId = getPermissionsTeamId();
 
         setPermissionsTeamId($company->id);
 
         try {
+            $this->ensurePermissions();
+
             $companyAdminRole = $this->role($company, 'company_admin');
             $managerRole = $this->role($company, 'manager');
             $workerRole = $this->role($company, 'worker');
@@ -23,6 +28,8 @@ class TenantRoleProvisioner
             $companyAdminRole->syncPermissions($this->permissions(RolePermissions::companyAdmin()));
             $managerRole->syncPermissions($this->permissions(RolePermissions::manager()));
             $workerRole->syncPermissions($this->permissions(RolePermissions::worker()));
+
+            $this->forgetCachedPermissions();
         } finally {
             setPermissionsTeamId($originalTeamId);
         }
@@ -50,5 +57,20 @@ class TenantRoleProvisioner
         return Permission::query()
             ->whereIn('name', $names)
             ->get();
+    }
+
+    private function ensurePermissions(): void
+    {
+        foreach (RolePermissions::all() as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ]);
+        }
+    }
+
+    private function forgetCachedPermissions(): void
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

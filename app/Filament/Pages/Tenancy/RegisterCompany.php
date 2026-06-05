@@ -5,6 +5,7 @@ namespace App\Filament\Pages\Tenancy;
 use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Schemas\Schema;
@@ -40,6 +41,8 @@ class RegisterCompany extends RegisterTenant
         $company->members()->syncWithoutDetaching([$user->id]);
 
         $originalTeamId = getPermissionsTeamId();
+
+        app(TenantRoleProvisioner::class)->provision($company);
 
         setPermissionsTeamId($company->id);
 

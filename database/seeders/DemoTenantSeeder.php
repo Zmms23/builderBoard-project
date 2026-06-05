@@ -15,6 +15,7 @@ use App\Models\Project;
 use App\Models\ProjectTimelineStage;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -175,6 +176,10 @@ class DemoTenantSeeder extends Seeder
         ]);
 
         try {
+            Company::query()->each(function (Company $company): void {
+                app(TenantRoleProvisioner::class)->provision($company);
+            });
+
             setPermissionsTeamId($buildBoard->id);
 
             $companyAdminRole = Role::firstOrCreate([
