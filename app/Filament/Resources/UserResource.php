@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Models\Role;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -17,13 +21,48 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedUsers;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $slug = 'members';
 
     protected static bool $isScopedToTenant = false;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make(__('user.sections.details'))
+                    ->schema([
+                        TextInput::make('name')
+                            ->label(__('user.fields.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->label(__('user.fields.email'))
+                            ->email()
+                            ->unique(User::class, 'email')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('password')
+                            ->label(__('user.fields.password'))
+                            ->password()
+                            ->required()
+                            ->minLength(8)
+                            ->maxLength(255),
+                        Select::make('role_name')
+                            ->label(__('user.fields.role'))
+                            ->options(static::assignableRoleOptions())
+                            ->default('worker')
+                            ->native(false)
+                            ->required(),
+                    ])
+                    ->columns([
+                        'lg' => 2,
+                    ]),
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -41,7 +80,7 @@ class UserResource extends Resource
                 TextColumn::make('current_role')
                     ->label(__('user.columns.role'))
                     ->state(fn (User $record): string => $record->getRoleNames()->first() ?? 'none')
-                    ->formatStateUsing(fn (string $state): string => __('user.roles.' . $state))
+                    ->formatStateUsing(fn (string $state): string => __('user.roles.'.$state))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'super_admin' => 'danger',
@@ -59,20 +98,7 @@ class UserResource extends Resource
             ->filters([
                 SelectFilter::make('role')
                     ->label(__('user.filters.role'))
-                    ->options(function (): array {
-                        $tenant = Filament::getTenant();
-
-                        if (! $tenant) {
-                            return [];
-                        }
-
-                        return Role::query()
-                            ->where('company_id', $tenant->getKey())
-                            ->orderBy('name')
-                            ->pluck('name', 'name')
-                            ->mapWithKeys(fn (string $roleName, string $key): array => [$key => __('user.roles.' . $roleName)])
-                            ->all();
-                    })
+                    ->options(static::roleFilterOptions())
                     ->query(function (Builder $query, array $data): Builder {
                         $role = $data['value'] ?? null;
 
@@ -91,6 +117,7 @@ class UserResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
         ];
     }
 
@@ -107,9 +134,27 @@ class UserResource extends Resource
             ->with('roles');
     }
 
-    public static function canCreate(): bool
+    /**
+     * @return array<string, string>
+     */
+    public static function assignableRoleOptions(): array
     {
-        return false;
+        return [
+            'company_admin' => __('user.roles.company_admin'),
+            'manager' => __('user.roles.manager'),
+            'worker' => __('user.roles.worker'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function roleFilterOptions(): array
+    {
+        return [
+            'super_admin' => __('user.roles.super_admin'),
+            ...static::assignableRoleOptions(),
+        ];
     }
 
     public static function getModelLabel(): string

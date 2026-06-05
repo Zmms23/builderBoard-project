@@ -6,6 +6,15 @@ return [
         'plural' => 'Members',
         'badge' => 'Members in current company',
     ],
+    'sections' => [
+        'details' => 'Member details',
+    ],
+    'fields' => [
+        'name' => 'Name',
+        'email' => 'Email',
+        'password' => 'Password',
+        'role' => 'Role',
+    ],
     'columns' => [
         'name' => 'Name',
         'email' => 'Email',
