@@ -2,16 +2,16 @@
 
 namespace App\Providers\Filament;
 
-use App\Enums\Locale;
 use App\Filament\Auth\Login;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
+use App\Http\Middleware\SetPermissionsTeam;
 use App\Http\Middleware\SetLocale;
 use App\Models\Company;
 use App\Settings\CompanySettings as CompanySettingsData;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use CraftForge\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,13 +27,8 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Http\Middleware\SetPermissionsTeam;
-
-
-
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -52,11 +47,14 @@ class AdminPanelProvider extends PanelProvider
 
             ->brandName(fn (): string => filament()->getTenant()?->name ?? config('app.name'))
 
-            ->brandLogo(fn (): ?string => $this->settings()?->logo_path? asset('storage/' . $this->settings()->logo_path): asset('images/download.png'))
-               
+            ->brandLogo(function (): string {
+                $logoPath = $this->settings()?->logo_path;
 
+                return $logoPath
+                    ? asset("storage/{$logoPath}")
+                    : asset('images/download.png');
+            })
             ->brandLogoHeight('2rem')
-
             ->colors(function (): array {
                 try {
                     return [
@@ -70,7 +68,6 @@ class AdminPanelProvider extends PanelProvider
                     ];
                 }
             })
-
             ->userMenuItems([
                 Action::make('currentRole')
                     ->label(fn (): string => __('user.menu.current_role', ['role' => $this->currentRoleLabel()]))
@@ -78,45 +75,17 @@ class AdminPanelProvider extends PanelProvider
                     ->disabled()
                     ->visible(fn (): bool => filament()->auth()->check())
                     ->sort(90),
-                Action::make('locale')
-                    ->label(fn (): string => Locale::current()->getLabel())
-                    ->icon(fn (): Heroicon => Locale::current()->getIcon())
-                    ->color(fn (): string => Locale::current()->getColor())
-                    ->schema([
-                        Select::make('locale')
-                            ->label(fn (): string => __('locale.language'))
-                            ->options(fn (): array => Locale::options())
-                            ->required()
-                            ->native(false),
-                    ])
-                    ->fillForm(fn (): array => [
-                        'locale' => app()->getLocale(),
-                    ])
-                    ->action(function (array $data) {
-                        $locale = Locale::tryFrom($data['locale']);
-
-                        abort_unless(
-                            $locale !== null && in_array($locale->value, Locale::values(), true),
-                            404
-                        );
-
-                        session(['locale' => $locale->value]);
-                        app()->setLocale($locale->value);
-
-                        return redirect(request()->header('Referer'));
-                    })
-                    ->sort(91),
             ])
 
-                ->domain('zura-meskhi-project.test')
-                ->tenant(Company::class)
-                ->tenantDomain($tenantDomain)
-                ->tenantRegistration(RegisterCompany::class)
-                ->tenantProfile(EditCompanyProfile::class)
+            ->domain('zura-meskhi-project.test')
+            ->tenant(Company::class)
+            ->tenantDomain($tenantDomain)
+            ->tenantRegistration(RegisterCompany::class)
+            ->tenantProfile(EditCompanyProfile::class)
 
             ->tenantMiddleware([
-                    SetPermissionsTeam::class,
-                ], isPersistent: true)
+                SetPermissionsTeam::class,
+            ], isPersistent: true)
 
             ->discoverResources(
                 in: app_path('Filament/Resources'),
@@ -156,6 +125,10 @@ class AdminPanelProvider extends PanelProvider
             ])
 
             ->plugins([
+                FilamentLanguageSwitcherPlugin::make()
+                    ->locales(fn (): array => config('app.available_locales', ['en', 'ka']))
+                    ->rememberLocale()
+                    ->showOnAuthPages(),
                 FilamentShieldPlugin::make(),
             ])
 
@@ -164,9 +137,9 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 
-    private function settings(): ?CompanySettingsData 
+    private function settings(): ?CompanySettingsData
     {
-        return app(CompanySettingsData::class);   
+        return app(CompanySettingsData::class);
     }
 
     private function currentRoleLabel(): string
