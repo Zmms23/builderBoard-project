@@ -3,8 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\User;
+use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -48,7 +50,7 @@ class UserResource extends Resource
                         TextInput::make('email')
                             ->label(__('user.fields.email'))
                             ->email()
-                            ->unique(User::class, 'email')
+                            ->unique(User::class, 'email', ignoreRecord: true)
                             ->required()
                             ->maxLength(255),
                         TextInput::make('password')
@@ -56,7 +58,8 @@ class UserResource extends Resource
                             ->password()
                             ->required()
                             ->minLength(8)
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->visibleOn('create'),
                         Select::make('role_name')
                             ->label(__('user.fields.role'))
                             ->options(static::assignableRoleOptions())
@@ -116,6 +119,9 @@ class UserResource extends Resource
                             $roleQuery->where('name', $role);
                         });
                     }),
+            ])
+            ->recordActions([
+                EditAction::make(),
             ]);
     }
 
@@ -124,6 +130,7 @@ class UserResource extends Resource
         return [
             'index' => ListUsers::route('/'),
             'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 
