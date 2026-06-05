@@ -5,7 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Models\Company;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
@@ -122,6 +125,33 @@ class UserResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+
+                Action::make('removeFromCompany')
+                    ->label(__('user.actions.remove.label'))
+                    ->icon(Heroicon::OutlinedTrash)
+                    ->color('danger')
+                    ->visible(fn (User $record): bool => Filament::auth()->user()?->can('Update:User') === true
+                        && ! $record->is(Filament::auth()->user()))
+                    ->requiresConfirmation()
+                    ->modalHeading(__('user.actions.remove.heading'))
+                    ->modalDescription(__('user.actions.remove.description'))
+                    ->modalSubmitActionLabel(__('user.actions.remove.submit'))
+                    ->successNotificationTitle(__('user.actions.remove.success'))
+                    ->action(function (User $record): void {
+                        abort_unless(Filament::auth()->user()?->can('Update:User') === true, 403);
+
+                        if ($record->is(Filament::auth()->user())) {
+                            return;
+                        }
+
+                        $tenant = Filament::getTenant();
+
+                        if (! $tenant instanceof Company) {
+                            return;
+                        }
+
+                        app(TenantRoleProvisioner::class)->removeFromCompany($tenant, $record);
+                    }),
             ]);
     }
 
@@ -141,7 +171,10 @@ class UserResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 filled($tenant),
-                fn (Builder $query): Builder => $query->whereHas('companies', fn (Builder $companyQuery): Builder => $companyQuery->whereKey($tenant->getKey())),
+                fn (Builder $query): Builder => $query->whereHas(
+                    'companies',
+                    fn (Builder $companyQuery): Builder => $companyQuery->whereKey($tenant->getKey())
+                ),
                 fn (Builder $query): Builder => $query->whereRaw('1 = 0'),
             )
             ->with('roles');

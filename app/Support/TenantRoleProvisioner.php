@@ -70,6 +70,24 @@ class TenantRoleProvisioner
         }
     }
 
+    public function removeFromCompany(Company $company, User $user): void
+    {
+        $originalTeamId = getPermissionsTeamId();
+
+        setPermissionsTeamId($company->id);
+
+        try {
+            $user->unsetRelation('roles');
+            $user->syncRoles([]);
+
+            $company->members()->detach($user->id);
+
+            $this->forgetCachedPermissions();
+        } finally {
+            setPermissionsTeamId($originalTeamId);
+        }
+    }
+
     private function role(Company $company, string $name): Role
     {
         return Role::firstOrCreate([

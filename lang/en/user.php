@@ -35,4 +35,18 @@ return [
     'menu' => [
         'current_role' => 'Current role: :role',
     ],
+    'actions' => [
+        'add_existing' => [
+            'label' => 'Add existing member',
+            'user' => 'User',
+            'role' => 'Role',
+        ],
+        'remove' => [
+            'label' => 'Remove from company',
+            'heading' => 'Remove member from company?',
+            'description' => 'The user will not be deleted, only removed from the current company.',
+            'submit' => 'Remove member',
+            'success' => 'Member removed',
+        ],
+    ],
 ];

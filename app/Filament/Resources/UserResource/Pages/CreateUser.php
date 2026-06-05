@@ -32,14 +32,6 @@ class CreateUser extends CreateRecord
             return;
         }
 
-        $tenant->members()->syncWithoutDetaching([
-            $this->record->id,
-        ]);
-
-        app(TenantRoleProvisioner::class)->assignRole(
-            $tenant,
-            $this->record,
-            $this->roleName
-        );
+        app(TenantRoleProvisioner::class)->assignRole($tenant, $this->record, $this->roleName);
     }
 }
