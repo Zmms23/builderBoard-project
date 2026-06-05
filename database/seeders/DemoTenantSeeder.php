@@ -13,8 +13,8 @@ use App\Models\Company;
 use App\Models\Order;
 use App\Models\Project;
 use App\Models\ProjectTimelineStage;
-use App\Models\Role;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -164,56 +164,35 @@ class DemoTenantSeeder extends Seeder
             ['name' => 'Worker', 'password' => Hash::make('password')]
         );
 
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'super@test.com'],
+            ['name' => 'Super Admin', 'password' => Hash::make('password')]
+        );
+
         $buildBoard->members()->syncWithoutDetaching([
             $admin->id,
             $manager->id,
             $worker->id,
+            $superAdmin->id,
         ]);
 
         $renova->members()->syncWithoutDetaching([
             $manager->id,
+            $superAdmin->id,
         ]);
 
         try {
-            setPermissionsTeamId($buildBoard->id);
+            $provisioner = app(TenantRoleProvisioner::class);
 
-            $companyAdminRole = Role::firstOrCreate([
-                'name' => 'company_admin',
-                'guard_name' => 'web',
-                'company_id' => $buildBoard->id,
-            ]);
+            Company::query()->each(function (Company $company) use ($provisioner, $superAdmin): void {
+                $provisioner->provision($company);
+                $provisioner->assignSuperAdmin($company, $superAdmin);
+            });
 
-            $managerRole = Role::firstOrCreate([
-                'name' => 'manager',
-                'guard_name' => 'web',
-                'company_id' => $buildBoard->id,
-            ]);
-
-            $workerRole = Role::firstOrCreate([
-                'name' => 'worker',
-                'guard_name' => 'web',
-                'company_id' => $buildBoard->id,
-            ]);
-
-            $admin->unsetRelation('roles');
-            $admin->syncRoles([$companyAdminRole]);
-
-            $manager->unsetRelation('roles');
-            $manager->syncRoles([$managerRole]);
-
-            $worker->unsetRelation('roles');
-            $worker->syncRoles([$workerRole]);
-
-            setPermissionsTeamId($renova->id);
-
-            $renovaManagerRole = Role::firstOrCreate([
-                'name' => 'manager',
-                'guard_name' => 'web',
-                'company_id' => $renova->id,
-            ]);
-
-            $manager->unsetRelation('roles');
-            $manager->syncRoles([$renovaManagerRole]);
+            $provisioner->assignCompanyAdmin($buildBoard, $admin);
+            $provisioner->assignRole($buildBoard, $manager, 'manager');
+            $provisioner->assignRole($buildBoard, $worker, 'worker');
+            $provisioner->assignRole($renova, $manager, 'manager');
         } finally {
             setPermissionsTeamId($originalTeamId);
         }

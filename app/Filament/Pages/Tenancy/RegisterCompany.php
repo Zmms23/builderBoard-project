@@ -3,8 +3,8 @@
 namespace App\Filament\Pages\Tenancy;
 
 use App\Models\Company;
-use App\Models\Role;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Schemas\Schema;
@@ -37,24 +37,7 @@ class RegisterCompany extends RegisterTenant
 
         /** @var User $user */
         $user = Auth::user();
-        $company->members()->syncWithoutDetaching([$user->id]);
-
-        $originalTeamId = getPermissionsTeamId();
-
-        setPermissionsTeamId($company->id);
-
-        try {
-            $companyAdminRole = Role::firstOrCreate([
-                'name' => 'company_admin',
-                'guard_name' => 'web',
-                'company_id' => $company->id,
-            ]);
-
-            $user->unsetRelation('roles');
-            $user->assignRole($companyAdminRole);
-        } finally {
-            setPermissionsTeamId($originalTeamId);
-        }
+        app(TenantRoleProvisioner::class)->assignCompanyAdmin($company, $user);
 
         return $company;
     }

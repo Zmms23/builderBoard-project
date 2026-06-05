@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Enums\Currency;
 use App\Settings\CompanySettings as CompanySettingsData;
 use BackedEnum;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -18,9 +19,11 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class CompanySettings extends SettingsPage
 {
+    use HasPageShield;
+
     protected static string $settings = CompanySettingsData::class;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     protected static ?int $navigationSort = 10;
 
@@ -29,7 +32,7 @@ class CompanySettings extends SettingsPage
         return __('settings.navigation.label');
     }
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('settings.pages.company_settings');
     }
