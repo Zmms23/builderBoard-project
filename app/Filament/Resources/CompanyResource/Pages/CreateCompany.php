@@ -13,8 +13,12 @@ class CreateCompany extends CreateRecord
 {
     protected static string $resource = CompanyResource::class;
 
-    protected ?int $adminUserId = null;
+    private ?int $adminUserId = null;
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $this->adminUserId = (int) ($data['admin_user_id'] ?? 0);
@@ -26,24 +30,21 @@ class CreateCompany extends CreateRecord
 
     protected function afterCreate(): void
     {
-        if (! $this->record instanceof Company) {
+        $admin = User::query()->find($this->adminUserId);
+
+        if (! $this->record instanceof Company || ! $admin instanceof User) {
             return;
         }
 
         $provisioner = app(TenantRoleProvisioner::class);
 
-        if ($this->adminUserId > 0) {
-            $admin = User::query()->find($this->adminUserId);
+        $provisioner->provision($this->record);
+        $provisioner->assignCompanyAdmin($this->record, $admin);
 
-            if ($admin instanceof User) {
-                $provisioner->assignCompanyAdmin($this->record, $admin);
-            }
-        }
+        $creator = Filament::auth()->user();
 
-        $currentUser = Filament::auth()->user();
-
-        if ($currentUser instanceof User) {
-            $provisioner->assignSuperAdmin($this->record, $currentUser);
+        if ($creator instanceof User) {
+            $provisioner->assignSuperAdmin($this->record, $creator);
         }
     }
 }

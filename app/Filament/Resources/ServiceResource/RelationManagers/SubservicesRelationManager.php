@@ -49,8 +49,8 @@ class SubservicesRelationManager extends RelationManager
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int|float|string|null $state): int => Price::toAmount($state))
                     ->required(),
 
                 Select::make('pricing_type')
@@ -98,17 +98,17 @@ class SubservicesRelationManager extends RelationManager
 
                 TextColumn::make('price_amount')
                     ->label(__('subservice.columns.price'))
-                    ->formatStateUsing(fn (int | float | string | null $state): string => $this->formatMoney($state))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => $this->formatMoney($state))
                     ->sortable(),
 
                 TextColumn::make('pricing_type')
                     ->label(__('subservice.columns.pricing_type'))
-                    ->formatStateUsing(fn (PricingType | string | null $state): string => $this->formatPricingType($state))
+                    ->formatStateUsing(fn (PricingType|string|null $state): string => $this->formatPricingType($state))
                     ->badge(),
 
                 TextColumn::make('unit')
                     ->label(__('subservice.columns.unit'))
-                    ->formatStateUsing(fn (UnitType | string | null $state): string => $this->formatUnit($state))
+                    ->formatStateUsing(fn (UnitType|string|null $state): string => $this->formatUnit($state))
                     ->badge(),
 
                 TextColumn::make('estimated_duration')
@@ -137,19 +137,19 @@ class SubservicesRelationManager extends RelationManager
         return app(CompanySettings::class)->currency->value;
     }
 
-    private function formatMoney(int | float | string | null $state): string
+    private function formatMoney(int|float|string|null $state): string
     {
         return Price::format($state, $this->currency());
     }
 
-    private function formatPricingType(PricingType | string | null $state): string
+    private function formatPricingType(PricingType|string|null $state): string
     {
         return $state instanceof PricingType
             ? $state->getLabel()
             : PricingType::tryFrom((string) $state)?->getLabel() ?? '-';
     }
 
-    private function formatUnit(UnitType | string | null $state): string
+    private function formatUnit(UnitType|string|null $state): string
     {
         return $state instanceof UnitType
             ? $state->getLabel()

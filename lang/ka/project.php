@@ -1,12 +1,29 @@
 <?php
 
 return [
+    'actions' => [
+        'complete' => [
+            'label' => 'დასრულება',
+            'success' => 'პროექტი დასრულდა',
+        ],
+        'open_workspace' => [
+            'label' => 'სამუშაო სივრცე',
+        ],
+        'start' => [
+            'label' => 'დაწყება',
+            'success' => 'პროექტი დაიწყო',
+        ],
+    ],
     'columns' => [
         'budget' => 'ბიუჯეტი',
         'client' => 'კლიენტი',
         'deadline' => 'დედლაინი',
         'order' => 'შეკვეთა',
+        'orders_count' => 'შეკვეთები',
+        'paid' => 'გადახდილი',
+        'proof_uploads_count' => 'ფოტოები',
         'progress' => 'პროგრესი',
+        'remaining' => 'დარჩენილი',
         'status' => 'სტატუსი',
         'title' => 'სათაური',
         'updated_at' => 'განახლდა',

@@ -2,16 +2,25 @@
 
 namespace App\Filament\Auth;
 
-use Illuminate\Support\Facades\App;
+use Filament\Support\Enums\Width;
+use Illuminate\Contracts\Support\Htmlable;
 
 class Login extends \Filament\Auth\Pages\Login
 {
+    protected Width|string|null $maxContentWidth = Width::ExtraLarge;
+
+    public function hasLogo(): bool
+    {
+        return false;
+    }
+
+    public function getHeading(): string|Htmlable|null
+    {
+        return null;
+    }
+
     public function getView(): string
     {
-        if (App::isLocal()) {
-            return 'filament.auth.local-login-page';
-        }
-
-        return parent::getView();
+        return 'filament.auth.local-login-page';
     }
 }

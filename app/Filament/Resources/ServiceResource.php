@@ -6,13 +6,15 @@ use App\Filament\Resources\ServiceResource\Pages\CreateService;
 use App\Filament\Resources\ServiceResource\Pages\EditService;
 use App\Filament\Resources\ServiceResource\Pages\ListServices;
 use App\Filament\Resources\ServiceResource\RelationManagers\SubservicesRelationManager;
+use App\Helpers\Price;
 use App\Models\Service;
+use App\Settings\CompanySettings;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -27,7 +29,7 @@ class ServiceResource extends Resource
 {
     protected static ?string $model = Service::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -50,6 +52,15 @@ class ServiceResource extends Resource
                             ->label(__('service.fields.description'))
                             ->rows(4)
                             ->columnSpanFull(),
+                        TextInput::make('base_price_amount')
+                            ->label(__('service.fields.base_price'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0)
+                            ->prefix(fn (): string => static::currency())
+                            ->formatStateUsing(fn (int|float|string|null $state): string => Price::fromAmount($state))
+                            ->dehydrateStateUsing(fn (int|float|string|null $state): int => Price::toAmount($state))
+                            ->required(),
                         Toggle::make('is_active')
                             ->label(__('service.fields.is_active'))
                             ->default(true)
@@ -74,6 +85,10 @@ class ServiceResource extends Resource
                     ->label(__('service.columns.description'))
                     ->limit(40)
                     ->wrap(),
+                TextColumn::make('base_price_amount')
+                    ->label(__('service.columns.base_price'))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => static::formatMoney($state))
+                    ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('service.columns.is_active'))
                     ->sortable(),
@@ -142,5 +157,15 @@ class ServiceResource extends Resource
     public static function getNavigationBadgeTooltip(): ?string
     {
         return __('service.navigation.badge');
+    }
+
+    private static function currency(): string
+    {
+        return app(CompanySettings::class)->currency->value;
+    }
+
+    private static function formatMoney(int|float|string|null $state): string
+    {
+        return Price::format($state, static::currency());
     }
 }

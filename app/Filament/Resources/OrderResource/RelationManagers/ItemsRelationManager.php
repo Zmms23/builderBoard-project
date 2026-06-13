@@ -10,8 +10,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -35,7 +35,7 @@ class ItemsRelationManager extends RelationManager
                     ->native(false)
                     ->required()
                     ->live()
-                    ->afterStateUpdated(function (Get $get, Set $set, int | string | null $state): void {
+                    ->afterStateUpdated(function (Get $get, Set $set, int|string|null $state): void {
                         $subservice = Subservice::find($state);
 
                         if (! $subservice) {
@@ -70,8 +70,8 @@ class ItemsRelationManager extends RelationManager
                     ->default(0)
                     ->minValue(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int|float|string|null $state): int => Price::toAmount($state))
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Get $get, Set $set): void {
                         $set('total_price_amount', $this->calculateTotal($get('quantity'), $get('unit_price_amount')));
@@ -82,8 +82,8 @@ class ItemsRelationManager extends RelationManager
                     ->numeric()
                     ->default(0)
                     ->prefix(fn (): string => $this->currency())
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::fromAmount($state))
-                    ->dehydrateStateUsing(fn (int | float | string | null $state): int => Price::toAmount($state))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => Price::fromAmount($state))
+                    ->dehydrateStateUsing(fn (int|float|string|null $state): int => Price::toAmount($state))
                     ->disabled()
                     ->dehydrated()
                     ->required(),
@@ -114,11 +114,11 @@ class ItemsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('unit_price_amount')
                     ->label(__('order_item.columns.unit_price'))
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::format($state, $this->currency()))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => Price::format($state, $this->currency()))
                     ->sortable(),
                 TextColumn::make('total_price_amount')
                     ->label(__('order_item.columns.total_price'))
-                    ->formatStateUsing(fn (int | float | string | null $state): string => Price::format($state, $this->currency()))
+                    ->formatStateUsing(fn (int|float|string|null $state): string => Price::format($state, $this->currency()))
                     ->sortable(),
             ])
             ->headerActions([
@@ -154,7 +154,7 @@ class ItemsRelationManager extends RelationManager
             ->all();
     }
 
-    private function calculateTotal(int | float | string | null $quantity, int | float | string | null $unitPrice): string
+    private function calculateTotal(int|float|string|null $quantity, int|float|string|null $unitPrice): string
     {
         return number_format(((float) ($quantity ?: 0)) * ((float) ($unitPrice ?: 0)), 2, '.', '');
     }

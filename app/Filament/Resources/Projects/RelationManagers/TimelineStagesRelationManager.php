@@ -67,9 +67,9 @@ class TimelineStagesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('project.timeline.columns.status'))
-                    ->formatStateUsing(fn (ProjectTimelineStageStatus | string | null $state): string => $this->formatStatus($state))
+                    ->formatStateUsing(fn (ProjectTimelineStageStatus|string|null $state): string => $this->formatStatus($state))
                     ->badge()
-                    ->color(fn (ProjectTimelineStageStatus | string | null $state): string => $this->statusColor($state)),
+                    ->color(fn (ProjectTimelineStageStatus|string|null $state): string => $this->statusColor($state)),
                 TextColumn::make('sort')
                     ->label(__('project.timeline.columns.sort'))
                     ->sortable(),
@@ -104,14 +104,14 @@ class TimelineStagesRelationManager extends RelationManager
             ]);
     }
 
-    private function formatStatus(ProjectTimelineStageStatus | string | null $state): string
+    private function formatStatus(ProjectTimelineStageStatus|string|null $state): string
     {
         return $state instanceof ProjectTimelineStageStatus
             ? $state->getLabel()
             : ProjectTimelineStageStatus::tryFrom((string) $state)?->getLabel() ?? '-';
     }
 
-    private function statusColor(ProjectTimelineStageStatus | string | null $state): string
+    private function statusColor(ProjectTimelineStageStatus|string|null $state): string
     {
         $status = $state instanceof ProjectTimelineStageStatus
             ? $state

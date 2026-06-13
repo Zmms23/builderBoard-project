@@ -3,10 +3,16 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\Login;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Tenancy\EditCompanyProfile;
 use App\Filament\Pages\Tenancy\RegisterCompany;
-use App\Http\Middleware\SetPermissionsTeam;
+use App\Filament\Widgets\FeatureReadiness;
+use App\Filament\Widgets\OperationalAlerts;
+use App\Filament\Widgets\PaymentChannels;
+use App\Filament\Widgets\TenantOverviewStats;
+use App\Filament\Widgets\UpcomingOrderDeadlines;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetPermissionsTeam;
 use App\Models\Company;
 use App\Settings\CompanySettings as CompanySettingsData;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -16,12 +22,11 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -34,9 +39,9 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $tenantDomain = app()->isLocal()
-            ? null
-            : '{tenant}.zura-meskhi-project.test';
+        $centralDomain = config('app.central_domain');
+        $tenantDomain = config('app.tenant_domain')
+            ?: (app()->isLocal() ? null : "{tenant}.{$centralDomain}");
 
         return $panel
             ->default()
@@ -52,9 +57,10 @@ class AdminPanelProvider extends PanelProvider
 
                 return $logoPath
                     ? asset("storage/{$logoPath}")
-                    : asset('images/download.png');
+                    : asset('images/logo.png');
             })
             ->brandLogoHeight('2rem')
+
             ->colors(function (): array {
                 try {
                     return [
@@ -68,16 +74,19 @@ class AdminPanelProvider extends PanelProvider
                     ];
                 }
             })
+
             ->userMenuItems([
                 Action::make('currentRole')
-                    ->label(fn (): string => __('user.menu.current_role', ['role' => $this->currentRoleLabel()]))
+                    ->label(fn (): string => __('user.menu.current_role', [
+                        'role' => $this->currentRoleLabel(),
+                    ]))
                     ->icon(Heroicon::OutlinedShieldCheck)
                     ->disabled()
                     ->visible(fn (): bool => filament()->auth()->check())
                     ->sort(90),
             ])
 
-            ->domain('zura-meskhi-project.test')
+            ->domain($centralDomain)
             ->tenant(Company::class)
             ->tenantDomain($tenantDomain)
             ->tenantRegistration(RegisterCompany::class)
@@ -108,7 +117,11 @@ class AdminPanelProvider extends PanelProvider
 
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                TenantOverviewStats::class,
+                OperationalAlerts::class,
+                FeatureReadiness::class,
+                PaymentChannels::class,
+                UpcomingOrderDeadlines::class,
             ])
 
             ->middleware([
@@ -126,14 +139,20 @@ class AdminPanelProvider extends PanelProvider
 
             ->plugins([
                 FilamentLanguageSwitcherPlugin::make()
-                    ->locales(fn (): array => config('app.available_locales', ['en', 'ka']))
+                    ->locales([
+                        ['code' => 'en', 'name' => 'English', 'flag' => 'us'],
+                        ['code' => 'ka', 'name' => 'ქართული', 'flag' => 'ge'],
+                    ])
                     ->rememberLocale()
-                    ->showOnAuthPages(),
+                    ->showOnAuthPages()
+                    ->renderHook(PanelsRenderHook::USER_MENU_BEFORE),
+
                 FilamentShieldPlugin::make(),
             ])
 
             ->authMiddleware([
                 Authenticate::class,
+                SetPermissionsTeam::class,
             ]);
     }
 
@@ -160,9 +179,9 @@ class AdminPanelProvider extends PanelProvider
             return __('user.roles.none');
         }
 
-        $translatedRole = __('user.roles.' . $role);
+        $translatedRole = __('user.roles.'.$role);
 
-        if ($translatedRole === 'user.roles.' . $role) {
+        if ($translatedRole === 'user.roles.'.$role) {
             return Str::of($role)->replace('_', ' ')->headline()->toString();
         }
 

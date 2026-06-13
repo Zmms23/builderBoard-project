@@ -28,7 +28,9 @@ class RolePermissions
     private const TENANT_RESOURCES = [
         'Client',
         'Order',
+        'Payment',
         'Project',
+        'ProofUpload',
         'Role',
         'Service',
         'User',
@@ -95,6 +97,17 @@ class RolePermissions
             'Create:Order',
             'Update:Order',
 
+            'ViewAny:Payment',
+            'View:Payment',
+            'Create:Payment',
+            'Update:Payment',
+
+            'ViewAny:ProofUpload',
+            'View:ProofUpload',
+            'Create:ProofUpload',
+            'Update:ProofUpload',
+            'Delete:ProofUpload',
+
             'ViewAny:Service',
             'View:Service',
         ];
@@ -106,6 +119,17 @@ class RolePermissions
     public static function worker(): array
     {
         return [
+            'ViewAny:Order',
+            'View:Order',
+
+            'ViewAny:Project',
+            'View:Project',
+
+            'ViewAny:ProofUpload',
+            'View:ProofUpload',
+            'Create:ProofUpload',
+            'Update:ProofUpload',
+
             'ViewAny:Service',
             'View:Service',
         ];

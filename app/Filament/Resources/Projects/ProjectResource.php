@@ -2,20 +2,25 @@
 
 namespace App\Filament\Resources\Projects;
 
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Filament\Resources\Projects\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\Projects\RelationManagers\PaymentsRelationManager;
+use App\Filament\Resources\Projects\RelationManagers\ProofUploadsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\TimelineStagesRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
 use App\Models\Project;
+use App\Support\TenantWorkScope;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProjectResource extends Resource
 {
@@ -43,7 +48,9 @@ class ProjectResource extends Resource
     {
         return [
             OrdersRelationManager::class,
+            PaymentsRelationManager::class,
             TimelineStagesRelationManager::class,
+            ProofUploadsRelationManager::class,
         ];
     }
 
@@ -54,6 +61,18 @@ class ProjectResource extends Resource
             'create' => CreateProject::route('/create'),
             'edit' => EditProject::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()
+            ->withCount(['orders', 'proofUploads'])
+            ->withSum([
+                'payments as paid_payments_sum' => fn (Builder $query): Builder => $query
+                    ->where('status', PaymentStatus::Paid->value),
+            ], 'amount');
+
+        return TenantWorkScope::projects($query);
     }
 
     public static function getModelLabel(): string
@@ -77,7 +96,7 @@ class ProjectResource extends Resource
             return null;
         }
 
-        return (string) static::getModel()::query()->count();
+        return (string) static::getEloquentQuery()->count();
     }
 
     public static function getNavigationBadgeTooltip(): ?string

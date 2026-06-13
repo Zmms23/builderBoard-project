@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RegisterCompany extends RegisterTenant
 {
@@ -33,12 +34,17 @@ class RegisterCompany extends RegisterTenant
      */
     protected function handleRegistration(array $data): Company
     {
-        $company = Company::create($data);
+        return DB::transaction(function () use ($data): Company {
+            $company = Company::create($data);
 
-        /** @var User $user */
-        $user = Auth::user();
-        app(TenantRoleProvisioner::class)->assignCompanyAdmin($company, $user);
+            /** @var User $user */
+            $user = Auth::user();
+            $provisioner = app(TenantRoleProvisioner::class);
 
-        return $company;
+            $provisioner->provision($company);
+            $provisioner->assignSuperAdmin($company, $user);
+
+            return $company;
+        });
     }
 }

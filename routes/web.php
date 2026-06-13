@@ -5,35 +5,38 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-if (app()->isLocal()) {
-    Route::post('/admin/login', function () {
-        $credentials = request()->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+$centralUrl = rtrim((string) config('app.url'), '/');
+$centralHost = parse_url($centralUrl, PHP_URL_HOST) ?: (string) config('app.central_domain');
 
-        if (! Auth::attempt($credentials, request()->boolean('remember'))) {
-            return redirect()
-                ->to(url('/admin/login'))
-                ->with('plain_login_error', __('auth.failed'))
-                ->withInput(['email' => $credentials['email']]);
-        }
+Route::post('/admin/login', function () {
+    $credentials = request()->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required', 'string'],
+    ]);
 
-        request()->session()->regenerate();
+    if (! Auth::attempt($credentials, request()->boolean('remember'))) {
+        return redirect()
+            ->to(url('/admin/login'))
+            ->with('plain_login_error', __('auth.failed'))
+            ->withInput(['email' => $credentials['email']]);
+    }
 
-        /** @var User|null $authenticatedUser */
-        $authenticatedUser = Auth::user();
+    request()->session()->regenerate();
 
-        $fallbackTenantId = $authenticatedUser?->companies()->orderBy('name')->value('companies.id');
+    /** @var User|null $authenticatedUser */
+    $authenticatedUser = Auth::user();
 
-        request()->session()->save();
+    $fallbackTenantId = $authenticatedUser?->companies()->orderBy('name')->value('companies.id');
 
-        return redirect()->intended($fallbackTenantId ? url("/admin/{$fallbackTenantId}") : url('/admin'), 303);
-    });
+    request()->session()->save();
 
-    Route::domain('{tenant}.zura-meskhi-project.test')
-        ->group(function (): void {
-            Route::get('/admin/{path?}', function (string $tenant, ?string $path = null) {
+    return redirect()->intended($fallbackTenantId ? url("/admin/{$fallbackTenantId}") : url('/admin'), 303);
+});
+
+if (app()->isLocal() && filled($centralHost)) {
+    Route::domain("{tenant}.{$centralHost}")
+        ->group(function () use ($centralUrl): void {
+            Route::get('/admin/{path?}', function (string $tenant, ?string $path = null) use ($centralUrl) {
                 $tenantId = ctype_digit($tenant)
                     ? (int) $tenant
                     : Company::query()
@@ -42,28 +45,48 @@ if (app()->isLocal()) {
                         ?->getKey();
 
                 if ($tenantId === null) {
-                    return redirect()->to('http://zura-meskhi-project.test/admin');
+                    return redirect()->to("{$centralUrl}/admin");
                 }
 
                 if (blank($path)) {
-                    return redirect()->to("http://zura-meskhi-project.test/admin/{$tenantId}");
+                    return redirect()->to("{$centralUrl}/admin/{$tenantId}");
                 }
 
                 $firstSegment = str($path)->before('/')->value();
 
                 if (in_array($firstSegment, ['login', 'register', 'password-reset', 'email-verification', 'profile'], true)) {
-                    return redirect()->to("http://zura-meskhi-project.test/admin/{$path}");
+                    return redirect()->to("{$centralUrl}/admin/{$path}");
                 }
 
                 if ($firstSegment === (string) $tenantId) {
-                    return redirect()->to("http://zura-meskhi-project.test/admin/{$path}");
+                    return redirect()->to("{$centralUrl}/admin/{$path}");
                 }
 
-                return redirect()->to("http://zura-meskhi-project.test/admin/{$tenantId}/{$path}");
+                return redirect()->to("{$centralUrl}/admin/{$tenantId}/{$path}");
             })->where('path', '.*');
         });
 }
 
 Route::get('/', function () {
-    return view('welcome');
+    /** @var User|null $authenticatedUser */
+    $authenticatedUser = Auth::user();
+
+    $fallbackTenantId = $authenticatedUser?->companies()->orderBy('name')->value('companies.id');
+
+    return view('welcome', [
+        'adminUrl' => $fallbackTenantId ? url("/admin/{$fallbackTenantId}") : url('/admin/login'),
+        'isAuthenticated' => Auth::check(),
+    ]);
+});
+
+Route::redirect('/login', '/admin/login');
+
+Route::get('/locale/{locale}', function (string $locale) {
+    $availableLocales = config('app.available_locales', []);
+
+    if (in_array($locale, $availableLocales, true)) {
+        request()->session()->put('locale', $locale);
+    }
+
+    return redirect()->back();
 });

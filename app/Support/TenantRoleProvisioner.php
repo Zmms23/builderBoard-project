@@ -6,7 +6,9 @@ use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Database\QueryException;
 use Spatie\Permission\PermissionRegistrar;
 
 class TenantRoleProvisioner
@@ -50,8 +52,6 @@ class TenantRoleProvisioner
 
     public function assignRole(Company $company, User $user, string $roleName): void
     {
-        $this->provision($company);
-
         $company->members()->syncWithoutDetaching([$user->id]);
 
         $originalTeamId = getPermissionsTeamId();
@@ -90,11 +90,40 @@ class TenantRoleProvisioner
 
     private function role(Company $company, string $name): Role
     {
-        return Role::firstOrCreate([
+        $attributes = [
             'name' => $name,
             'guard_name' => 'web',
             'company_id' => $company->id,
-        ]);
+        ];
+
+        $role = Role::query()
+            ->where($attributes)
+            ->first();
+
+        if ($role instanceof Role) {
+            return $role;
+        }
+
+        try {
+            $roleId = DB::table(config('permission.table_names.roles'))
+                ->insertGetId([
+                    ...$attributes,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            return Role::query()->findOrFail($roleId);
+        } catch (QueryException $exception) {
+            $existingRole = Role::query()
+                ->where($attributes)
+                ->first();
+
+            if ($existingRole instanceof Role) {
+                return $existingRole;
+            }
+
+            throw $exception;
+        }
     }
 
     /**

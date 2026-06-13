@@ -2,30 +2,35 @@
 
 namespace Tests\Feature;
 
+use App\Models\Company;
 use App\Models\User;
+use App\Support\TenantRoleProvisioner;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AdminPanelAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_with_company_admin_role_can_access_admin_panel(): void
+    public function test_company_admin_can_access_their_company_tenant(): void
     {
+        $company = Company::factory()->create();
         $user = User::factory()->create();
-        $role = Role::create(['name' => 'company_admin']);
 
-        $user->assignRole($role);
+        app(TenantRoleProvisioner::class)->provision($company);
+        app(TenantRoleProvisioner::class)->assignCompanyAdmin($company, $user);
 
         $this->assertTrue($user->canAccessPanel(Filament::getPanel('admin')));
+        $this->assertTrue($user->canAccessTenant($company));
     }
 
-    public function test_user_without_staff_role_can_not_access_admin_panel(): void
+    public function test_user_without_company_membership_can_not_access_that_tenant(): void
     {
+        $company = Company::factory()->create();
         $user = User::factory()->create();
 
-        $this->assertFalse($user->canAccessPanel(Filament::getPanel('admin')));
+        $this->assertTrue($user->canAccessPanel(Filament::getPanel('admin')));
+        $this->assertFalse($user->canAccessTenant($company));
     }
 }

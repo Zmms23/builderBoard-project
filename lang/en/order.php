@@ -1,7 +1,18 @@
 <?php
 
 return [
+    'actions' => [
+        'approve' => [
+            'label' => 'Approve',
+            'success' => 'Order approved',
+        ],
+        'reject' => [
+            'label' => 'Reject',
+            'success' => 'Order rejected',
+        ],
+    ],
     'columns' => [
+        'assigned_user' => 'Responsible',
         'client' => 'Client',
         'created_at' => 'Created at',
         'deadline' => 'Deadline',
@@ -13,6 +24,7 @@ return [
         'title' => 'Title',
     ],
     'fields' => [
+        'assigned_user' => 'Responsible member',
         'client' => 'Client',
         'deadline' => 'Deadline',
         'estimated_price' => 'Estimated price',
@@ -24,9 +36,13 @@ return [
         'title' => 'Order title',
     ],
     'filters' => [
+        'assigned_user' => 'Responsible',
         'client' => 'Client',
         'project' => 'Project',
         'status' => 'Status',
+    ],
+    'help' => [
+        'assigned_user' => 'Workers only see orders assigned to them.',
     ],
     'navigation' => [
         'badge' => 'Order count',

@@ -31,6 +31,18 @@ class CompanySettings extends Settings
 
     public bool $reviews_enabled = false;
 
+    public bool $cash_payments_enabled = true;
+
+    public bool $bank_transfer_enabled = true;
+
+    public ?string $bank_name = null;
+
+    public ?string $bank_account_name = null;
+
+    public ?string $bank_account_number = null;
+
+    public ?string $payment_instructions = null;
+
     public static function group(): string
     {
         return 'company';

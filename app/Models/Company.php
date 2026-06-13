@@ -55,4 +55,20 @@ class Company extends Model
     {
         return $this->hasMany(Project::class);
     }
+
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * @return HasMany<ProofUpload, $this>
+     */
+    public function proofUploads(): HasMany
+    {
+        return $this->hasMany(ProofUpload::class);
+    }
 }

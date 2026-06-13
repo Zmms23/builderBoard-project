@@ -118,8 +118,15 @@ class UserResource extends Resource
                             return $query;
                         }
 
-                        return $query->whereHas('roles', function (Builder $roleQuery) use ($role): void {
-                            $roleQuery->where('name', $role);
+                        $tenant = Filament::getTenant();
+
+                        return $query->whereHas('roles', function (Builder $roleQuery) use ($role, $tenant): void {
+                            $roleQuery
+                                ->where('name', $role)
+                                ->when(
+                                    filled($tenant),
+                                    fn (Builder $roleQuery): Builder => $roleQuery->where('roles.company_id', $tenant->getKey()),
+                                );
                         });
                     }),
             ])

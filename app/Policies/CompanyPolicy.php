@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Company;
+use Filament\Facades\Filament;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 
@@ -34,7 +35,8 @@ class CompanyPolicy
 
     public function delete(AuthUser $authUser, Company $company): bool
     {
-        return $authUser->can('Delete:Company');
+        return $authUser->can('Delete:Company')
+            && Filament::getTenant()?->is($company) !== true;
     }
 
     public function deleteAny(AuthUser $authUser): bool
@@ -49,7 +51,8 @@ class CompanyPolicy
 
     public function forceDelete(AuthUser $authUser, Company $company): bool
     {
-        return $authUser->can('ForceDelete:Company');
+        return $authUser->can('ForceDelete:Company')
+            && Filament::getTenant()?->is($company) !== true;
     }
 
     public function forceDeleteAny(AuthUser $authUser): bool

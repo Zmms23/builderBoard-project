@@ -1,0 +1,100 @@
+<?php
+
+return [
+    'alerts' => [
+        'deadline_risks' => [
+            'description' => 'Active projects due within 14 days below 80% progress.',
+            'label' => 'Deadline risk',
+        ],
+        'description' => 'The most important operational issues for this tenant.',
+        'heading' => 'Needs attention',
+        'overdue_orders' => [
+            'description' => 'Open orders that passed their deadline.',
+            'label' => 'Overdue orders',
+        ],
+        'pending_approvals' => [
+            'description' => 'Orders waiting for client or manager approval.',
+            'label' => 'Pending approvals',
+        ],
+        'unpaid_balance' => [
+            'description' => 'Expected order value that has not been paid yet.',
+            'label' => 'Unpaid balance',
+        ],
+    ],
+    'deadlines' => [
+        'columns' => [
+            'client' => 'Client',
+            'deadline' => 'Deadline',
+            'estimated_price' => 'Estimate',
+            'number' => 'No.',
+            'progress' => 'Progress',
+            'project' => 'Project',
+            'status' => 'Status',
+            'title' => 'Order',
+        ],
+        'description' => 'Orders that need attention soon.',
+        'empty_description' => 'Create orders with deadlines and they will appear here.',
+        'empty_heading' => 'No open deadlines',
+        'heading' => 'Upcoming order deadlines',
+    ],
+    'features' => [
+        'budget_tracking' => [
+            'description' => 'Shows budgets, payment totals, and unpaid balance warnings.',
+            'label' => 'Budget tracking',
+        ],
+        'chat' => [
+            'description' => 'Marks direct client communication as enabled for later portal work.',
+            'label' => 'Chat',
+        ],
+        'client_progress' => [
+            'description' => 'Shows progress percentages in operational and client-facing views.',
+            'label' => 'Client progress',
+        ],
+        'description' => 'Feature switches controlled from company settings.',
+        'disabled' => 'Off',
+        'enabled' => 'On',
+        'heading' => 'Client portal readiness',
+        'proof_upload' => [
+            'description' => 'Marks photo proof uploads as enabled for project updates.',
+            'label' => 'Proof uploads',
+        ],
+        'reviews' => [
+            'description' => 'Marks client reviews as enabled after completed work.',
+            'label' => 'Reviews',
+        ],
+    ],
+    'payment_channels' => [
+        'account_name' => 'Account holder',
+        'account_number' => 'Account / IBAN',
+        'bank_name' => 'Bank',
+        'bank_ready' => 'Bank transfer details are ready for clients.',
+        'bank_transfer' => 'Bank transfer',
+        'cash' => 'Cash',
+        'cash_description' => 'Useful when clients pay directly during the renovation process.',
+        'description' => 'Payment details the company can share with clients.',
+        'disabled' => 'Off',
+        'enabled' => 'On',
+        'heading' => 'Payment channels',
+        'missing_bank_details' => 'Bank transfer is enabled, but account details are missing.',
+    ],
+    'stats' => [
+        'active_projects' => 'Active projects',
+        'active_projects_description' => 'Planning or in progress',
+        'clients' => 'Clients',
+        'clients_description' => 'Registered for this company',
+        'estimated_revenue' => 'Estimated revenue',
+        'estimated_revenue_description' => 'Pending and approved orders',
+        'members' => 'Team members',
+        'members_description' => 'Users connected to this company',
+        'overdue_orders' => 'Overdue orders',
+        'overdue_orders_description' => 'Open orders past deadline',
+        'paid_revenue' => 'Paid revenue',
+        'paid_revenue_description' => 'Confirmed client payments',
+        'pending_orders' => 'Pending orders',
+        'pending_orders_description' => 'Draft or waiting approval',
+        'proof_uploads' => 'Proof uploads',
+        'proof_uploads_description' => 'Photo updates from workers',
+        'remaining_balance' => 'Remaining balance',
+        'remaining_balance_description' => 'Expected minus paid amount',
+    ],
+];

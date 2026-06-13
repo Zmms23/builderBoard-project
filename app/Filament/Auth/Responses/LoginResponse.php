@@ -10,7 +10,7 @@ use Livewire\Features\SupportRedirects\Redirector;
 
 class LoginResponse implements LoginResponseContract
 {
-    public function toResponse($request): RedirectResponse | Redirector
+    public function toResponse($request): RedirectResponse|Redirector
     {
         $panel = Filament::getCurrentOrDefaultPanel();
         $user = Filament::auth()->user();

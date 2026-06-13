@@ -1,12 +1,15 @@
 <?php
+
 return [
     'columns' => [
+        'base_price' => 'Base price',
         'description' => 'Description',
         'is_active' => 'Active',
         'name' => 'Name',
         'updated_at' => 'Updated at',
     ],
     'fields' => [
+        'base_price' => 'Base price',
         'description' => 'Description',
         'is_active' => 'Active',
         'name' => 'Service name',

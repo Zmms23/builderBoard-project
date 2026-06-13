@@ -1,12 +1,29 @@
 <?php
 
 return [
+    'actions' => [
+        'complete' => [
+            'label' => 'Complete',
+            'success' => 'Project completed',
+        ],
+        'open_workspace' => [
+            'label' => 'Open workspace',
+        ],
+        'start' => [
+            'label' => 'Start',
+            'success' => 'Project started',
+        ],
+    ],
     'columns' => [
         'budget' => 'Budget',
         'client' => 'Client',
         'deadline' => 'Deadline',
         'order' => 'Order',
+        'orders_count' => 'Orders',
+        'paid' => 'Paid',
+        'proof_uploads_count' => 'Proofs',
         'progress' => 'Progress',
+        'remaining' => 'Remaining',
         'status' => 'Status',
         'title' => 'Title',
         'updated_at' => 'Updated at',

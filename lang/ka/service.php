@@ -2,12 +2,14 @@
 
 return [
     'columns' => [
+        'base_price' => 'საბაზისო ფასი',
         'description' => 'აღწერა',
         'is_active' => 'აქტიური',
         'name' => 'სახელი',
         'updated_at' => 'განახლდა',
     ],
     'fields' => [
+        'base_price' => 'საბაზისო ფასი',
         'description' => 'აღწერა',
         'is_active' => 'აქტიურია',
         'name' => 'სერვისის სახელი',
