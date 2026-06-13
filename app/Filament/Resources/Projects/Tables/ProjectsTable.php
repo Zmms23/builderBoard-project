@@ -28,10 +28,6 @@ class ProjectsTable
                     ->label(__('project.columns.title'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('order.number')
-                    ->label(__('project.columns.order'))
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('client.name')
                     ->label(__('project.columns.client'))
                     ->searchable()

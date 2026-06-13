@@ -28,12 +28,15 @@ class PaymentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'payments';
 
-    protected static ?string $title = 'Payments';
-
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
         return app(CompanySettings::class)->budget_tracking_enabled
             && parent::canViewForRecord($ownerRecord, $pageClass);
+    }
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('payment.navigation.plural');
     }
 
     public function form(Schema $schema): Schema

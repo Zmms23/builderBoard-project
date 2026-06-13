@@ -45,6 +45,7 @@ return [
         'badge' => 'პროექტების რაოდენობა',
         'plural' => 'პროექტები',
         'singular' => 'პროექტი',
+        'workspace' => 'სამუშაო სივრცე',
     ],
     'sections' => [
         'details' => 'პროექტის დეტალები',
@@ -57,6 +58,7 @@ return [
         'planning' => 'დაგეგმვა',
     ],
     'timeline' => [
+        'title' => 'პროექტის ეტაპები',
         'columns' => [
             'ends_at' => 'დასრულება',
             'name' => 'ეტაპი',
@@ -76,11 +78,40 @@ return [
         'filters' => [
             'status' => 'სტატუსი',
         ],
+        'default_stages' => [
+            'demolition' => 'დემონტაჟი',
+            'electrical' => 'ელექტრობა',
+            'final' => 'საბოლოო ჩაბარება',
+            'painting' => 'შეღებვა',
+            'planning' => 'დაგეგმვა',
+            'plumbing' => 'სანტექნიკა',
+        ],
     ],
     'timeline_stage_statuses' => [
         'blocked' => 'დაბლოკილი',
         'completed' => 'დასრულებული',
         'in_progress' => 'მიმდინარეობს',
         'pending' => 'მოლოდინში',
+    ],
+    'workspace' => [
+        'client' => 'კლიენტი',
+        'client_updates' => 'კლიენტის განახლებები',
+        'deadline' => 'დედლაინი: :deadline',
+        'description' => 'აქ ერთ სივრცეში იმართება კლიენტი, შეკვეთები, ეტაპები, ფოტო-მტკიცებულებები და გადახდები.',
+        'estimated_total' => 'სავარაუდო თანხა',
+        'eyebrow' => 'პროექტის სამუშაო სივრცე',
+        'latest_proof' => 'ბოლო: :proof',
+        'next_order' => 'შემდეგი: :order, დედლაინი :deadline',
+        'no_client_contact' => 'კონტაქტი არ არის მითითებული',
+        'no_open_orders' => 'ღია შეკვეთა არ არის',
+        'no_proofs' => 'ფოტო ჯერ არ ატვირთულა',
+        'orders' => 'შეკვეთები',
+        'orders_summary' => ':open ღია / სულ :total',
+        'paid_total' => 'გადახდილი',
+        'remaining_total' => 'დარჩენილი',
+        'timeline' => 'ეტაპები',
+        'timeline_summary' => ':done / :total ეტაპი დასრულებულია',
+        'title' => 'სამუშაო სივრცე: :project',
+        'visible_proofs' => ':count ხილული ფოტო',
     ],
 ];

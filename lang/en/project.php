@@ -45,6 +45,7 @@ return [
         'badge' => 'Project count',
         'plural' => 'Projects',
         'singular' => 'Project',
+        'workspace' => 'Project workspace',
     ],
     'sections' => [
         'details' => 'Project details',
@@ -57,6 +58,7 @@ return [
         'planning' => 'Planning',
     ],
     'timeline' => [
+        'title' => 'Timeline stages',
         'columns' => [
             'ends_at' => 'Ends at',
             'name' => 'Stage',
@@ -76,11 +78,40 @@ return [
         'filters' => [
             'status' => 'Status',
         ],
+        'default_stages' => [
+            'demolition' => 'Demolition',
+            'electrical' => 'Electrical',
+            'final' => 'Final handover',
+            'painting' => 'Painting',
+            'planning' => 'Planning',
+            'plumbing' => 'Plumbing',
+        ],
     ],
     'timeline_stage_statuses' => [
         'blocked' => 'Blocked',
         'completed' => 'Completed',
         'in_progress' => 'In progress',
         'pending' => 'Pending',
+    ],
+    'workspace' => [
+        'client' => 'Client',
+        'client_updates' => 'Client updates',
+        'deadline' => 'Deadline: :deadline',
+        'description' => 'Manage the client, orders, timeline, proofs and payments from one place.',
+        'estimated_total' => 'Estimated total',
+        'eyebrow' => 'Project workspace',
+        'latest_proof' => 'Latest: :proof',
+        'next_order' => 'Next: :order, deadline :deadline',
+        'no_client_contact' => 'No contact saved',
+        'no_open_orders' => 'No open orders',
+        'no_proofs' => 'No proof uploaded yet',
+        'orders' => 'Orders',
+        'orders_summary' => ':open open / :total total',
+        'paid_total' => 'Paid',
+        'remaining_total' => 'Remaining',
+        'timeline' => 'Timeline',
+        'timeline_summary' => ':done / :total stages completed',
+        'title' => 'Workspace: :project',
+        'visible_proofs' => ':count visible proofs',
     ],
 ];

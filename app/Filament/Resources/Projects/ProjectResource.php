@@ -32,7 +32,7 @@ class ProjectResource extends Resource
 
     protected static ?string $tenantOwnershipRelationshipName = 'company';
 
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 18;
 
     public static function form(Schema $schema): Schema
     {
@@ -87,7 +87,7 @@ class ProjectResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('project.navigation.plural');
+        return __('project.navigation.workspace');
     }
 
     public static function getNavigationBadge(): ?string

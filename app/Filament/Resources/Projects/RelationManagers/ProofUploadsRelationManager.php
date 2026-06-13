@@ -21,17 +21,21 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ProofUploadsRelationManager extends RelationManager
 {
     protected static string $relationship = 'proofUploads';
 
-    protected static ?string $title = 'Proof uploads';
-
-    public static function canViewForRecord($ownerRecord, string $pageClass): bool
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
         return app(CompanySettings::class)->proof_upload_enabled
             && parent::canViewForRecord($ownerRecord, $pageClass);
+    }
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('proof_upload.navigation.plural');
     }
 
     public function form(Schema $schema): Schema
