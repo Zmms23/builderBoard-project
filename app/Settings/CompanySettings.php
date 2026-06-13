@@ -23,6 +23,8 @@ class CompanySettings extends Settings
 
     public bool $client_progress_enabled = true;
 
+    public bool $client_email_notifications_enabled = true;
+
     public bool $budget_tracking_enabled = true;
 
     public bool $proof_upload_enabled = true;

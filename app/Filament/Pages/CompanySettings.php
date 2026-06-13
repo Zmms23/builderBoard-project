@@ -89,6 +89,9 @@ class CompanySettings extends SettingsPage
                         Toggle::make('client_progress_enabled')
                             ->label(__('settings.fields.client_progress_enabled'))
                             ->helperText(__('settings.help.client_progress_enabled')),
+                        Toggle::make('client_email_notifications_enabled')
+                            ->label(__('settings.fields.client_email_notifications_enabled'))
+                            ->helperText(__('settings.help.client_email_notifications_enabled')),
                         Toggle::make('budget_tracking_enabled')
                             ->label(__('settings.fields.budget_tracking_enabled'))
                             ->helperText(__('settings.help.budget_tracking_enabled')),

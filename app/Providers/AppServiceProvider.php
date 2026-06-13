@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Filament\Auth\Responses\LoginResponse as CustomLoginResponse;
 use App\Models\Permission;
+use App\Models\ProofUpload;
 use App\Models\Role;
+use App\Observers\ProofUploadObserver;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
@@ -33,5 +35,7 @@ class AppServiceProvider extends ServiceProvider
         app(PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
+
+        ProofUpload::observe(ProofUploadObserver::class);
     }
 }
