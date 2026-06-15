@@ -49,6 +49,22 @@ return [
     ],
     'sections' => [
         'details' => 'Project details',
+        'quick_order' => 'Quick start order',
+        'quick_order_description' => 'Create the first order together with the project so the team can start from one workspace.',
+    ],
+    'quick_order' => [
+        'fields' => [
+            'assigned_user' => 'Responsible member',
+            'deadline' => 'Order deadline',
+            'enabled' => 'Create first order now',
+            'estimated_price' => 'Estimated order price',
+            'notes' => 'Order notes',
+            'title' => 'Order title',
+        ],
+        'help' => [
+            'assigned_user' => 'Optional. Workers will only see orders assigned to them.',
+            'enabled' => 'Recommended when the customer already knows the first job, for example bathroom renovation or painting.',
+        ],
     ],
     'statuses' => [
         'active' => 'Active',
@@ -94,6 +110,8 @@ return [
         'pending' => 'Pending',
     ],
     'workspace' => [
+        'active_services' => ':count active services',
+        'budget_received' => 'Budget received',
         'client' => 'Client',
         'client_updates' => 'Client updates',
         'deadline' => 'Deadline: :deadline',
@@ -108,6 +126,27 @@ return [
         'orders' => 'Orders',
         'orders_summary' => ':open open / :total total',
         'paid_total' => 'Paid',
+        'progress_value' => ':progress% done',
+        'readiness' => [
+            'description' => 'Keep these basics ready before the project becomes busy.',
+            'orders' => [
+                'description' => 'Break the project into clear, priced orders.',
+                'label' => 'First order',
+            ],
+            'proofs' => [
+                'description' => 'Visible proof updates keep the client informed.',
+                'label' => 'Client proof',
+            ],
+            'services' => [
+                'description' => 'Service prices power order estimates.',
+                'label' => 'Service catalog',
+            ],
+            'timeline' => [
+                'description' => 'Timeline stages make progress easy to explain.',
+                'label' => 'Timeline',
+            ],
+            'title' => 'Workspace readiness',
+        ],
         'remaining_total' => 'Remaining',
         'timeline' => 'Timeline',
         'timeline_summary' => ':done / :total stages completed',

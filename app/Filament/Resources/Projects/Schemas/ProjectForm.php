@@ -7,14 +7,18 @@ use App\Enums\ClientType;
 use App\Enums\ProjectStatus;
 use App\Helpers\Price;
 use App\Models\Client;
+use App\Models\User;
 use App\Settings\CompanySettings;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProjectForm
 {
@@ -104,6 +108,50 @@ class ProjectForm
                     ->columns([
                         'lg' => 2,
                     ]),
+                Section::make(__('project.sections.quick_order'))
+                    ->description(__('project.sections.quick_order_description'))
+                    ->schema([
+                        Toggle::make('first_order_enabled')
+                            ->label(__('project.quick_order.fields.enabled'))
+                            ->helperText(__('project.quick_order.help.enabled'))
+                            ->live()
+                            ->dehydrated(),
+                        TextInput::make('first_order_title')
+                            ->label(__('project.quick_order.fields.title'))
+                            ->maxLength(255)
+                            ->required(fn (Get $get): bool => (bool) $get('first_order_enabled'))
+                            ->visible(fn (Get $get): bool => (bool) $get('first_order_enabled')),
+                        Select::make('first_order_assigned_user_id')
+                            ->label(__('project.quick_order.fields.assigned_user'))
+                            ->helperText(__('project.quick_order.help.assigned_user'))
+                            ->options(fn (): array => static::memberOptions())
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->visible(fn (Get $get): bool => (bool) $get('first_order_enabled')),
+                        DatePicker::make('first_order_deadline')
+                            ->label(__('project.quick_order.fields.deadline'))
+                            ->native(false)
+                            ->visible(fn (Get $get): bool => (bool) $get('first_order_enabled')),
+                        TextInput::make('first_order_estimated_price_amount')
+                            ->label(__('project.quick_order.fields.estimated_price'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0)
+                            ->prefix(fn (): string => static::currency())
+                            ->formatStateUsing(fn (int|float|string|null $state): string => Price::fromAmount($state))
+                            ->dehydrateStateUsing(fn (int|float|string|null $state): int => Price::toAmount($state))
+                            ->visible(fn (Get $get): bool => (bool) $get('first_order_enabled')),
+                        Textarea::make('first_order_notes')
+                            ->label(__('project.quick_order.fields.notes'))
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->visible(fn (Get $get): bool => (bool) $get('first_order_enabled')),
+                    ])
+                    ->visibleOn('create')
+                    ->columns([
+                        'lg' => 2,
+                    ]),
             ]);
     }
 
@@ -128,6 +176,30 @@ class ProjectForm
     private static function currency(): string
     {
         return app(CompanySettings::class)->currency->value;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function memberOptions(): array
+    {
+        $tenant = Filament::getTenant();
+
+        if (! $tenant) {
+            return [];
+        }
+
+        return User::query()
+            ->whereHas(
+                'companies',
+                fn (Builder $query): Builder => $query->whereKey($tenant->getKey()),
+            )
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (User $user): array => [
+                $user->id => "{$user->name} ({$user->email})",
+            ])
+            ->all();
     }
 
     /**
